@@ -1,0 +1,52 @@
+@model List<Attendly.Models.Report>
+@{
+ ViewData["Title"] = "Manage Reports";
+ }
+
+<div class="container-fluid px-4 py-4" style="background: #f0f2f5; min-height: 100vh;">
+ <h3 class="fw-bold mb-4"><i class="fas fa-flag text-warning me-2"></i>Manage Reports</h3>
+
+ <div class="card border-0 shadow-sm">
+ <div class="card-body p-0">
+ <div class="table-responsive">
+ <table class="table table-hover mb-0">
+ <thead>
+ <tr>
+ <th>Reporter</th>
+ <th>Reported User</th>
+ <th>Reason</th>
+ <th>Status</th>
+ <th>Date</th>
+ <th>Actions</th>
+ </tr>
+ </thead>
+ <tbody>
+ @foreach (var report in Model)
+ {
+ <tr>
+ <td>@report.Reporter?.FullName</td>
+ <td>@report.ReportedUser?.FullName</td>
+ <td>@report.Reason</td>
+ <td><span class="badge bg-@(report.Status == "pending" ? "warning" : report.Status == "actioned" ? "success" : "secondary")">@report.Status</span></td>
+ <td>@report.CreatedAt.ToString("MMM dd")</td>
+ <td>
+ @if (report.Status == "pending")
+ {
+ <form asp-action="ReviewReport" asp-route-id="@report.Id" method="post" class="d-inline">
+ <input type="hidden" name="action" value="dismiss" />
+ <button type="submit" class="btn btn-sm btn-outline-warning">Dismiss</button>
+ </form>
+ <form asp-action="ReviewReport" asp-route-id="@report.Id" method="post" class="d-inline">
+ <input type="hidden" name="action" value="action" />
+ <button type="submit" class="btn btn-sm btn-outline-danger">Action</button>
+ </form>
+ }
+ </td>
+ </tr>
+ }
+ </tbody>
+ </table>
+ </div>
+ </div>
+ </div>
+</div>

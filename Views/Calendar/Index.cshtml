@@ -1,0 +1,122 @@
+@{
+ ViewData["Title"] = "Calendar";
+ var viewDate = ViewBag.ViewDate ?? DateTime.Now;
+ var userEvents = ViewBag.UserEvents as List<Attendly.Models.CalendarEvent> ?? new();
+ var holidays = ViewBag.Holidays as List<Attendly.Models.Holiday> ?? new();
+ var monthName = viewDate.ToString("MMMM yyyy");
+ var daysOfWeek = new[] { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
+ var firstDay = new DateTime(viewDate.Year, viewDate.Month, 1);
+ var daysInMonth = DateTime.DaysInMonth(viewDate.Year, viewDate.Month);
+ // Calculate how many blank cells before day 1
+ int startDow = ((int)firstDay.DayOfWeek + 6) % 7; // 0=Mon
+ }
+
+<div class="container-fluid px-4 py-4" style="background: #f0f2f5; min-height: 100vh;">
+ <div class="row justify-content-center">
+ <div class="col-lg-10">
+ <div class="d-flex justify-content-between align-items-center mb-4">
+ <h3 class="fw-bold"><i class="fas fa-calendar text-primary me-2"></i>@monthName</h3>
+ <div class="btn-group">
+ <a asp-action="Index" asp-route-year="@viewDate.AddMonths(-1).Year" asp-route-month="@viewDate.AddMonths(-1).Month" class="btn btn-outline-primary"><i class="fas fa-chevron-left"></i></a>
+ <a asp-action="Index" asp-route-year="@viewDate.AddMonths(1).Year" asp-route-month="@viewDate.AddMonths(1).Month" class="btn btn-outline-primary"><i class="fas fa-chevron-right"></i></a>
+ </div>
+ </div>
+
+ <div class="card border-0 shadow-sm">
+ <div class="card-body p-0">
+ <div class="row g-0">
+ @foreach (var dow in daysOfWeek)
+ {
+ <div class="col text-center py-2 fw-bold text-muted border bg-light">@dow</div>
+ }
+ </div>
+ <div class="row g-0">
+ @for (int i = 0; i < startDow; i++)
+ {
+ <div class="col border" style="min-height: 100px; background: #fafafa;"></div>
+ }
+
+ @for (int day = 1; day <= daysInMonth; day++)
+ {
+ var currentDate = new DateTime(viewDate.Year, viewDate.Month, day);
+ var dayEvents = userEvents.Where(e => e.Date.Date == currentDate.Date).ToList();
+ var dayHolidays = holidays.Where(h => h.Date.Date == currentDate.Date).ToList();
+ var isToday = currentDate.Date == DateTime.Now.Date;
+ var isWeekend = currentDate.DayOfWeek == DayOfWeek.Saturday || currentDate.DayOfWeek == DayOfWeek.Sunday;
+ var cellClass = isToday ? "border-primary border-2" : "border";
+ var bgClass = isWeekend ? "bg-light" : "";
+
+ <div class="col @cellClass @bgClass" style="min-height: 100px;">
+ <div class="p-1"><span class="badge rounded-circle @(isToday ? "bg-primary" : "bg-light text-dark")">@day</span></div>
+ @foreach (var evt in dayEvents)
+ {
+ <div class="p-1 mx-1 mb-1 rounded text-white small" style="background: #6366f1; font-size: 0.7rem;">@evt.Title</div>
+ }
+ @foreach (var h in dayHolidays)
+ {
+ <div class="p-1 mx-1 mb-1 rounded text-white small" style="background: #22c55e; font-size: 0.7rem;">@h.Name</div>
+ }
+ </div>
+ }
+ @{
+ // Fill remaining cells
+ int totalCells = startDow + daysInMonth;
+ int remaining = (7 - totalCells % 7) % 7;
+ for (int i = 0; i < remaining; i++)
+ {
+ <div class="col border" style="min-height: 100px; background: #fafafa;"></div>
+ }
+ }
+ </div>
+ </div>
+ </div>
+
+ <div class="mt-3">
+ <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEventModal">
+ <i class="fas fa-plus me-1"></i>Add Event
+ </button>
+ </div>
+ </div>
+ </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="addEventModal" tabindex="-1">
+ <div class="modal-dialog">
+ <div class="modal-content">
+ <div class="modal-header">
+ <h5 class="modal-title">Add Event</h5>
+ <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+ </div>
+ <form asp-action="AddEvent" method="post">
+ <div class="modal-body">
+ <div class="mb-3">
+ <label class="form-label">Title</label>
+ <input name="title" class="form-control" required />
+ </div>
+ <div class="mb-3">
+ <label class="form-label">Date</label>
+ <input name="date" type="date" class="form-control" value="@viewDate.ToString("yyyy-MM-dd")" required />
+ </div>
+ <div class="mb-3">
+ <label class="form-label">Type</label>
+ <select name="eventType" class="form-select">
+ <option value="personal">Personal</option>
+ <option value="holiday">Holiday</option>
+ <option value="exam">Exam</option>
+ <option value="college">College Event</option>
+ </select>
+ </div>
+ <div class="mb-3">
+ <label class="form-label">Description</label>
+ <textarea name="description" class="form-control" rows="2"></textarea>
+ </div>
+ </div>
+ <div class="modal-footer">
+ <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+ <button type="submit" class="btn btn-primary">Add Event</button>
+ </div>
+ </form>
+ </div>
+ </div>
+</div>

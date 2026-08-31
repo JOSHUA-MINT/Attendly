@@ -1,0 +1,96 @@
+@model Attendly.ViewModels.RegisterViewModel
+@{
+ ViewData["Title"] = "Register - Attendly";
+ }
+<div class="auth-page d-flex align-items-center justify-content-center" style="min-height: 100vh; background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); padding: 2rem 0;">
+ <div class="card shadow-lg border-0" style="width: 100%; max-width: 520px; border-radius: 16px;">
+ <div class="card-body p-5">
+ <div class="text-center mb-4">
+ <i class="fas fa-graduation-cap fa-3x text-primary mb-3"></i>
+ <h3 class="fw-bold">Create Account</h3>
+ <p class="text-muted">Join Attendly and take control of your attendance</p>
+ </div>
+
+ <div asp-validation-summary="ModelOnly" class="alert alert-danger" style="display:none"></div>
+
+ <form asp-action="Register" method="post" id="registerForm">
+ <div class="row g-3">
+ <div class="col-md-6">
+ <label class="form-label">Full Name *</label>
+ <div class="input-group">
+ <span class="input-group-text"><i class="fas fa-user"></i></span>
+ <input asp-for="FullName" class="form-control" placeholder="Your full name" required />
+ </div>
+ <span asp-validation-for="FullName" class="text-danger small"></span>
+ </div>
+ <div class="col-md-6">
+ <label class="form-label">Email *</label>
+ <div class="input-group">
+ <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+ <input asp-for="Email" class="form-control" type="email" placeholder="you@college.edu" required />
+ </div>
+ <span asp-validation-for="Email" class="text-danger small"></span>
+ </div>
+ <div class="col-md-6">
+ <label class="form-label">Password *</label>
+ <div class="input-group">
+ <span class="input-group-text"><i class="fas fa-lock"></i></span>
+ <input asp-for="Password" class="form-control" type="password" placeholder="Min 6 characters" required minlength="6" />
+ </div>
+ <span asp-validation-for="Password" class="text-danger small"></span>
+ </div>
+ <div class="col-md-6">
+ <label class="form-label">Confirm Password *</label>
+ <div class="input-group">
+ <span class="input-group-text"><i class="fas fa-lock"></i></span>
+ <input asp-for="ConfirmPassword" class="form-control" type="password" placeholder="Confirm password" required />
+ </div>
+ <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+ </div>
+ <div class="col-md-6">
+ <label class="form-label">College</label>
+ <input asp-for="College" class="form-control" placeholder="Your college name" />
+ </div>
+ <div class="col-md-6">
+ <label class="form-label">Course</label>
+ <input asp-for="Course" class="form-control" placeholder="e.g. B.Tech CSE" />
+ </div>
+ <div class="col-md-6">
+ <label class="form-label">Year</label>
+ <select asp-for="Year" class="form-select">
+ <option value="">Select year</option>
+ <option value="FY">First Year (FY)</option>
+ <option value="SY">Second Year (SY)</option>
+ <option value="TY">Third Year (TY)</option>
+ <option value="Final">Final Year</option>
+ </select>
+ </div>
+ <div class="col-md-6">
+ <label class="form-label">Division</label>
+ <input asp-for="Division" class="form-control" placeholder="e.g. A, B, C" />
+ </div>
+ <div class="col-md-6">
+ <label class="form-label">Railway Line</label>
+ <select asp-for="RailwayLine" class="form-select">
+ <option value="">Select line</option>
+ <option value="Western">Western Line</option>
+ <option value="Central">Central Line</option>
+ <option value="Other">Other</option>
+ </select>
+ </div>
+ <div class="col-md-6">
+ <label class="form-label">Station</label>
+ <input asp-for="Station" class="form-control" placeholder="e.g. Andheri" />
+ </div>
+ </div>
+ <button type="submit" class="btn btn-primary w-100 py-2 mt-3">
+ Create Account <i class="fas fa-arrow-right ms-2"></i>
+ </button>
+ </form>
+
+ <div class="text-center mt-4">
+ <p class="text-muted small">Already have an account? <a asp-action="Login" class="text-primary text-decoration-none fw-bold">Sign in</a></p>
+ </div>
+ </div>
+ </div>
+</div>

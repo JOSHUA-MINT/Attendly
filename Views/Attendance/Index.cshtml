@@ -1,0 +1,82 @@
+@model Attendly.ViewModels.AttendanceRecordsViewModel
+@{
+ ViewData["Title"] = "Attendance Records";
+ }
+
+<div class="container-fluid px-4 py-4" style="background: #f0f2f5; min-height: 100vh;">
+ <div class="row">
+ <div class="col-12">
+ <h3 class="fw-bold mb-3"><i class="fas fa-clipboard-list text-primary me-2"></i>@Model.SubjectName - Records</h3>
+
+ @if (TempData["Success"] != null)
+ {
+ <div class="alert alert-success">@TempData["Success"]</div>
+ }
+
+ <div class="row g-3 mb-4">
+ <div class="col-md-3">
+ <div class="card border-0 shadow-sm">
+ <div class="card-body text-center">
+ <h2 class="fw-bold text-primary">@Model.AttendancePercentage.ToString("F1")%</h2>
+ <p class="text-muted mb-0">Attendance</p>
+ </div>
+ </div>
+ </div>
+ <div class="col-md-3">
+ <div class="card border-0 shadow-sm">
+ <div class="card-body text-center">
+ <h2 class="fw-bold text-success">@Model.PresentCount</h2>
+ <p class="text-muted mb-0">Present</p>
+ </div>
+ </div>
+ </div>
+ <div class="col-md-3">
+ <div class="card border-0 shadow-sm">
+ <div class="card-body text-center">
+ <h2 class="fw-bold text-danger">@Model.AbsentCount</h2>
+ <p class="text-muted mb-0">Absent</p>
+ </div>
+ </div>
+ </div>
+ <div class="col-md-3">
+ <div class="card border-0 shadow-sm">
+ <div class="card-body text-center">
+ <h2 class="fw-bold text-warning">@Model.SafeAbsences</h2>
+ <p class="text-muted mb-0">Safe Absences</p>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <div class="card border-0 shadow-sm">
+ <div class="card-body p-0">
+ <div class="table-responsive">
+ <table class="table table-hover mb-0">
+ <thead class="table-light">
+ <tr>
+ <th>Date</th>
+ <th>Status</th>
+ <th>Notes</th>
+ </tr>
+ </thead>
+ <tbody>
+ @foreach (var record in Model.Records)
+ {
+ <tr>
+ <td>@record.Date.ToString("MMM dd, yyyy")</td>
+ <td>
+ <span class="badge bg-@(record.Status == "present" ? "success" : record.Status == "absent" ? "danger" : record.Status == "cancelled" ? "secondary" : "warning")">
+ @record.Status.ToUpper()
+ </span>
+ </td>
+ <td>@record.Notes</td>
+ </tr>
+ }
+ </tbody>
+ </table>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+</div>

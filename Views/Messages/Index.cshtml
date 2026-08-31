@@ -1,0 +1,42 @@
+@model List<Attendly.ViewModels.ConversationViewModel>
+@{
+ ViewData["Title"] = "Messages";
+ }
+
+<div class="container-fluid px-4 py-4" style="background: #f0f2f5; min-height: 100vh;">
+ <div class="row">
+ <div class="col-lg-3">
+ <div class="card border-0 shadow-sm">
+ <div class="card-header bg-white border-0">
+ <h5 class="fw-bold mb-0"><i class="fas fa-comments text-primary me-2"></i>Conversations</h5>
+ </div>
+ <div class="list-group list-group-flush">
+ @foreach (var conv in Model)
+ {
+ <a asp-action="Chat" asp-route-conversationId="@conv.ConversationId" class="list-group-item list-group-item-action @(ViewBag.ActiveConversationId == conv.ConversationId ? "active" : "")">
+ <div class="d-flex justify-content-between">
+ <div>
+ <strong>@conv.OtherUserName</strong>
+ <p class="small text-muted mb-0 text-truncate" style="max-width: 200px;">@conv.LastMessage</p>
+ </div>
+ @if (conv.UnreadCount > 0)
+ {
+ <span class="badge bg-primary rounded-pill">@conv.UnreadCount</span>
+ }
+ </div>
+ </a>
+ }
+ </div>
+ </div>
+ </div>
+ <div class="col-lg-9">
+ <div class="card border-0 shadow-sm">
+ <div class="card-body text-center py-5">
+ <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+ <h4>Select a conversation</h4>
+ <p class="text-muted">Choose a conversation from the left to start messaging.</p>
+ </div>
+ </div>
+ </div>
+ </div>
+</div>

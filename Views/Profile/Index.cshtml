@@ -1,0 +1,97 @@
+@model Attendly.ViewModels.ProfileViewModel
+@{
+ ViewData["Title"] = "My Profile";
+ }
+
+<div class="container-fluid px-4 py-4" style="background: #f0f2f5; min-height: 100vh;">
+ <div class="row justify-content-center">
+ <div class="col-lg-8">
+ <div class="card border-0 shadow-sm">
+ <div class="card-body p-5">
+ <div class="d-flex justify-content-between align-items-start mb-4">
+ <h3 class="fw-bold"><i class="fas fa-user text-primary me-2"></i>My Profile</h3>
+ <a asp-action="Edit" class="btn btn-primary btn-sm"><i class="fas fa-edit me-1"></i>Edit Profile</a>
+ </div>
+
+ <div class="text-center mb-4">
+ <div class="rounded-circle mx-auto d-flex align-items-center justify-content-center text-white" style="width: 120px; height: 120px; background: linear-gradient(135deg, #6366f1, #8b5cf6); font-size: 3rem; font-weight: bold;">
+ @if (!string.IsNullOrEmpty(Model.ProfileImageUrl))
+ {
+ <img src="@Model.ProfileImageUrl" alt="" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;" />
+ }
+ else
+ {
+ @Model.FullName.Substring(0, 1).ToUpper()
+ }
+ </div>
+ <h4 class="fw-bold mt-3">@Model.FullName</h4>
+ <p class="text-muted">@Model.Course · @Model.Year · @Model.College</p>
+ @if (Model.IsPremium)
+ {
+ <span class="badge bg-warning text-dark"><i class="fas fa-crown me-1"></i>Premium</span>
+ }
+ </div>
+
+ <div class="row g-3">
+ <div class="col-md-6">
+ <div class="p-3 rounded bg-light">
+ <label class="text-muted small">Email</label>
+ <p class="fw-bold mb-0">@Model.Email</p>
+ </div>
+ </div>
+ <div class="col-md-6">
+ <div class="p-3 rounded bg-light">
+ <label class="text-muted small">College</label>
+ <p class="fw-bold mb-0">@(Model.College ?? "Not set")</p>
+ </div>
+ </div>
+ <div class="col-md-6">
+ <div class="p-3 rounded bg-light">
+ <label class="text-muted small">Railway Line</label>
+ <p class="fw-bold mb-0">@(Model.RailwayLine ?? "Not set")</p>
+ </div>
+ </div>
+ <div class="col-md-6">
+ <div class="p-3 rounded bg-light">
+ <label class="text-muted small">Station</label>
+ <p class="fw-bold mb-0">@(Model.Station ?? "Not set")</p>
+ </div>
+ </div>
+ <div class="col-12">
+ <div class="p-3 rounded bg-light">
+ <label class="text-muted small">Bio</label>
+ <p class="mb-0">@(string.IsNullOrEmpty(Model.Bio) ? "No bio yet." : Model.Bio)</p>
+ </div>
+ </div>
+ </div>
+
+ <div class="row g-3 mt-2">
+ <div class="col-md-4">
+ <div class="card border-0 shadow-sm text-center">
+ <div class="card-body">
+ <h3 class="fw-bold text-primary">@Model.TotalSubjects</h3>
+ <p class="text-muted mb-0">Subjects</p>
+ </div>
+ </div>
+ </div>
+ <div class="col-md-4">
+ <div class="card border-0 shadow-sm text-center">
+ <div class="card-body">
+ <h3 class="fw-bold text-success">@Model.TotalConnections</h3>
+ <p class="text-muted mb-0">Connections</p>
+ </div>
+ </div>
+ </div>
+ <div class="col-md-4">
+ <div class="card border-0 shadow-sm text-center">
+ <div class="card-body">
+ <h3 class="fw-bold text-warning">@(Model.IsPremium ? "Active" : "Inactive")</h3>
+ <p class="text-muted mb-0">Premium</p>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+</div>

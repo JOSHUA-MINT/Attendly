@@ -1,0 +1,60 @@
+## Ignore Visual Studio files
+.vs/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## Ignore build outputs
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+*.cache
+*.dbmdl
+*.dbproj.schemaview
+
+## Ignore .NET
+project.lock.json
+project.fragment.lock.json
+artifacts/
+*.dgml
+**/Properties/launchSettings.json
+
+## Ignore NuGet
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+*.nuget.props
+*.nuget.targets
+
+## Ignore environment
+.env
+.env.local
+.env.*.local
+
+## Ignore logs
+*.log
+logs/
+*.trx
+*.coverage
+*.coveragexml
+
+## Ignore test results
+TestResults/
+[Tt]est[Rr]esult*/
+[Rr]eports/
+
+## Ignore Rider
+.idea/
+*.sln.iml
+
+## Ignore macOS
+.DS_Store
+
+## Ignore node_modules
+node_modules/
+wwwroot/lib/

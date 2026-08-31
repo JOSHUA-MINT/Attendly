@@ -1,0 +1,117 @@
+@model Attendly.ViewModels.PremiumViewModel
+@{
+ ViewData["Title"] = "Attendly Premium";
+ }
+
+<div class="container-fluid px-4 py-4" style="background: #f0f2f5; min-height: 100vh;">
+ <div class="row justify-content-center">
+ <div class="col-lg-8">
+ <div class="text-center mb-5">
+ <div class="display-1">👑</div>
+ <h2 class="fw-bold">Attendly Premium</h2>
+ <p class="lead text-muted">Unlock advanced insights and take full control of your attendance.</p>
+ </div>
+
+ @if (Model.IsPremium)
+ {
+ <div class="card border-0 shadow-sm mb-4 border-start border-success border-4">
+ <div class="card-body text-center">
+ <h4 class="text-success"><i class="fas fa-check-circle me-2"></i>You're a Premium Member!</h4>
+ <p class="mb-0">Your subscription is active until @Model.PremiumExpiresAt?.ToString("MMMM dd, yyyy")</p>
+ </div>
+ </div>
+ }
+
+ <div class="row g-4 mb-5">
+ <div class="col-md-6">
+ <div class="card border-0 shadow-sm h-100 @(!Model.IsPremium ? "border-primary" : "")">
+ <div class="card-body p-5">
+ <h4 class="fw-bold">Free</h4>
+ <h2 class="display-4 fw-bold">Free</h2>
+ <ul class="list-unstyled mt-3">
+ <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Add unlimited subjects</li>
+ <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Mark attendance</li>
+ <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Basic analytics</li>
+ <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Basic calendar</li>
+ <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Student discovery</li>
+ <li class="mb-2 text-muted"><i class="fas fa-times me-2"></i> Advanced predictions</li>
+ <li class="mb-2 text-muted"><i class="fas fa-times me-2"></i> Holiday planner</li>
+ <li class="mb-2 text-muted"><i class="fas fa-times me-2"></i> Export reports</li>
+ </ul>
+ </div>
+ </div>
+ </div>
+ <div class="col-md-6">
+ <div class="card border-0 shadow-sm h-100 border-warning" style="background: linear-gradient(135deg, #fef3c7, #fff);">
+ <div class="card-body p-5">
+ <span class="badge bg-warning text-dark mb-2">Recommended</span>
+ <h4 class="fw-bold">Premium</h4>
+ <h2 class="display-4 fw-bold">₹49<span class="fs-6 text-muted">/mo</span></h2>
+ <p class="text-muted small">Or ₹399/year (save 32%)</p>
+ <ul class="list-unstyled mt-3">
+ <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Advanced attendance predictions</li>
+ <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Unlimited skip simulations</li>
+ <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Advanced holiday planner</li>
+ <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Detailed monthly reports</li>
+ <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Export attendance report</li>
+ <li class="mb-2"><i class="fas fa-check text-success me-2"></i> AI-style insights</li>
+ <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Custom attendance rules</li>
+ <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Priority support</li>
+ </ul>
+ @if (!Model.IsPremium)
+ {
+ <button class="btn btn-warning w-100 mt-3" onclick="initiatePayment('monthly')">
+ <i class="fas fa-crown me-1"></i>Upgrade to Premium
+ </button>
+ }
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+</div>
+
+@if (!Model.IsPremium)
+{
+ <script>
+ function initiatePayment(plan) {
+ fetch('@Url.Action("CreateOrder", "Premium")', {
+ method: 'POST',
+ headers: {
+ 'Content-Type': 'application/x-www-form-urlencoded',
+ 'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+ },
+ body: 'plan=' + plan
+ })
+ .then(r => r.json())
+ .then(data => {
+ if (data.success === false) { alert(data.message || 'Payment failed'); return; }
+ var options = {
+ key: '@Model.RazorpayKeyId',
+ amount: plan === 'yearly' ? 39900 : 4900,
+ currency: 'INR',
+ name: 'Attendly Premium',
+ description: plan === 'yearly' ? 'Yearly Subscription' : 'Monthly Subscription',
+ order_id: data.id,
+ handler: function(response) {
+ var form = document.createElement('form');
+ form.method = 'POST';
+ form.action = '@Url.Action("VerifyPayment", "Premium")';
+ form.innerHTML = '<input name="__RequestVerificationToken" value="' + (document.querySelector('input[name="__RequestVerificationToken"]')?.value || '') + '" />' +
+ '<input name="razorpay_order_id" value="' + response.razorpay_order_id + '" />' +
+ '<input name="razorpay_payment_id" value="' + response.razorpay_payment_id + '" />' +
+ '<input name="razorpay_signature" value="' + response.razorpay_signature + '" />' +
+ '<input name="plan" value="' + plan + '" />';
+ document.body.appendChild(form);
+ form.submit();
+ }
+ };
+ var rzp = new Razorpay(options);
+ rzp.open();
+ })
+ .catch(err => { alert('An error occurred. Please try again.'); });
+ }
+ </script>
+ <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+}

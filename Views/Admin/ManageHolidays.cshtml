@@ -1,0 +1,68 @@
+@model List<Attendly.Models.Holiday>
+@{
+ ViewData["Title"] = "Manage Holidays";
+ }
+
+<div class="container-fluid px-4 py-4" style="background: #f0f2f5; min-height: 100vh;">
+ <h3 class="fw-bold mb-4"><i class="fas fa-calendar text-primary me-2"></i>Manage Holidays</h3>
+
+ <div class="card border-0 shadow-sm mb-4">
+ <div class="card-body">
+ <form asp-action="AddHoliday" method="post" class="row g-3">
+ <div class="col-md-4">
+ <input name="name" class="form-control" placeholder="Holiday name" required />
+ </div>
+ <div class="col-md-3">
+ <input name="date" type="date" class="form-control" required />
+ </div>
+ <div class="col-md-2">
+ <select name="type" class="form-select">
+ <option value="public">Public</option>
+ <option value="college">College</option>
+ <option value="regional">Regional</option>
+ </select>
+ </div>
+ <div class="col-md-2">
+ <input name="region" class="form-control" placeholder="Region" />
+ </div>
+ <div class="col-md-1">
+ <button type="submit" class="btn btn-primary w-100"><i class="fas fa-plus"></i></button>
+ </div>
+ </form>
+ </div>
+ </div>
+
+ <div class="card border-0 shadow-sm">
+ <div class="card-body p-0">
+ <div class="table-responsive">
+ <table class="table table-hover mb-0">
+ <thead>
+ <tr>
+ <th>Name</th>
+ <th>Date</th>
+ <th>Type</th>
+ <th>Region</th>
+ <th>Action</th>
+ </tr>
+ </thead>
+ <tbody>
+ @foreach (var h in Model)
+ {
+ <tr>
+ <td>@h.Name</td>
+ <td>@h.Date.ToString("MMM dd, yyyy")</td>
+ <td><span class="badge bg-secondary">@h.Type</span></td>
+ <td>@h.Region</td>
+ <td>
+ <form asp-action="DeleteHoliday" asp-route-id="@h.Id" method="post" onsubmit="return confirm('Delete this holiday?')">
+ <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+ </form>
+ </td>
+ </tr>
+ }
+ </tbody>
+ </table>
+ </div>
+ </div>
+ </div>
+</div>

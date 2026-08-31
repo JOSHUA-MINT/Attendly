@@ -1,0 +1,67 @@
+@model List<Attendly.ViewModels.AttendanceMarkViewModel>
+@{
+ ViewData["Title"] = "Mark Attendance";
+ }
+
+<div class="container-fluid px-4 py-4" style="background: #f0f2f5; min-height: 100vh;">
+ <div class="row justify-content-center">
+ <div class="col-lg-6">
+ <h3 class="fw-bold mb-4"><i class="fas fa-clipboard-check text-primary me-2"></i>Today's Attendance</h3>
+
+ @if (ViewBag.NoClassesToday != null && (bool)ViewBag.NoClassesToday)
+ {
+ <div class="card border-0 shadow-sm text-center py-5">
+ <div class="card-body">
+ <i class="fas fa-coffee fa-3x text-muted mb-3"></i>
+ <h4>No classes scheduled today!</h4>
+ <p class="text-muted">Enjoy your day off or catch up on studies.</p>
+ <a asp-controller="Attendance" asp-action="Index" class="btn btn-primary">View Attendance Records</a>
+ </div>
+ </div>
+ }
+ else
+ {
+ @foreach (var item in Model)
+ {
+ <div class="card border-0 shadow-sm mb-3">
+ <div class="card-body">
+ <div class="d-flex justify-content-between align-items-center">
+ <div>
+ <h5 class="fw-bold">@item.SubjectName</h5>
+ <p class="text-muted mb-0"><i class="fas fa-clock me-1"></i>@item.StartTime.ToString(@"hh\:mm") - @item.EndTime.ToString(@"hh\:mm")</p>
+ @if (!string.IsNullOrEmpty(item.Room))
+ {
+ <p class="text-muted mb-0 small"><i class="fas fa-map-marker-alt me-1"></i>@item.Room</p>
+ }
+ </div>
+ <div class="d-flex gap-2">
+ @if (item.MarkedStatus == null)
+ {
+ <form asp-action="Mark" asp-route-subjectId="@item.SubjectId" method="post">
+ <input type="hidden" name="status" value="present" />
+ <button type="submit" class="btn btn-success"><i class="fas fa-check me-1"></i>Present</button>
+ </form>
+ <form asp-action="Mark" asp-route-subjectId="@item.SubjectId" method="post">
+ <input type="hidden" name="status" value="absent" />
+ <button type="submit" class="btn btn-danger"><i class="fas fa-times me-1"></i>Absent</button>
+ </form>
+ }
+ else
+ {
+ <span class="badge bg-@(item.MarkedStatus == "present" ? "success" : "danger") fs-6 px-3 py-2">
+ @item.MarkedStatus.ToUpper()
+ </span>
+ }
+ </div>
+ </div>
+ </div>
+ </div>
+ }
+ }
+
+ <div class="text-center mt-3">
+ <a asp-action="Index" class="btn btn-outline-primary"><i class="fas fa-list me-1"></i>View All Records</a>
+ </div>
+ </div>
+ </div>
+</div>

@@ -1,0 +1,40 @@
+@{
+ ViewData["Title"] = "Attendance Criteria";
+ }
+
+<div class="container-fluid px-4 py-4" style="background: #f0f2f5; min-height: 100vh;">
+ <div class="row justify-content-center">
+ <div class="col-lg-6">
+ <div class="card border-0 shadow-sm">
+ <div class="card-body p-5">
+ <h3 class="fw-bold mb-2">Attendance Requirement</h3>
+ <p class="text-muted mb-4">Set your attendance target. All analytics will be calculated against this.</p>
+
+ @if (TempData["Success"] != null)
+ {
+ <div class="alert alert-success">@TempData["Success"]</div>
+ }
+
+ <form method="post" asp-action="Criteria">
+ <div class="mb-4">
+ <label class="form-label fw-bold">Select your required attendance percentage:</label>
+ <div class="row g-2 mt-2">
+ @foreach (var pct in new[] { 50, 60, 75, 80, 85 })
+ {
+ <div class="col-4">
+ <div class="form-check">
+ <input class="form-check-input" type="radio" name="targetPercentage" id="pct_@pct" value="@pct"
+ @(ViewBag.Profile?.TargetPercentage == pct || (pct == 75 && ViewBag.Profile?.TargetPercentage == null) ? "checked" : "") />
+ <label class="form-check-label" for="pct_@pct">@pct%</label>
+ </div>
+ </div>
+ }
+ </div>
+ </div>
+ <button type="submit" class="btn btn-primary">Save Preference</button>
+ </form>
+ </div>
+ </div>
+ </div>
+ </div>
+</div>

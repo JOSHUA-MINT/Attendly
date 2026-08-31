@@ -1,0 +1,125 @@
+@model Attendly.ViewModels.AnalyticsViewModel
+@{
+ ViewData["Title"] = "Analytics";
+ }
+
+<div class="container-fluid px-4 py-4" style="background: #f0f2f5; min-height: 100vh;">
+ <h3 class="fw-bold mb-4"><i class="fas fa-chart-bar text-primary me-2"></i>Attendance Analytics</h3>
+
+ <!-- Overall Stats -->
+ <div class="row g-3 mb-4">
+ <div class="col-md-4">
+ <div class="card border-0 shadow-sm">
+ <div class="card-body text-center">
+ <h1 class="display-4 fw-bold text-primary">@Model.OverallAttendance.ToString("F1")%</h1>
+ <p class="text-muted">Overall Attendance</p>
+ <p class="mb-0">Target: @Model.TargetPercentage%</p>
+ </div>
+ </div>
+ </div>
+ <div class="col-md-8">
+ <div class="card border-0 shadow-sm">
+ <div class="card-body">
+ <h6 class="fw-bold mb-3">Subject Comparison</h6>
+ @foreach (var subj in Model.SubjectAnalytics.OrderByDescending(s => s.AttendancePercentage))
+ {
+ <div class="d-flex align-items-center mb-2">
+ <span class="me-2 small" style="width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@subj.SubjectName</span>
+ <div class="progress flex-grow-1" style="height: 20px;">
+ <div class="progress-bar" style="width: @subj.AttendancePercentage%; background-color: @(subj.Color ?? "#3B82F6");">
+ @if (subj.AttendancePercentage > 10)
+ {
+ <span class="small">@subj.AttendancePercentage.ToString("F1")%</span>
+ }
+ </div>
+ </div>
+ </div>
+ }
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <!-- Distribution -->
+ <div class="row g-3 mb-4">
+ <div class="col-lg-6">
+ <div class="card border-0 shadow-sm">
+ <div class="card-body">
+ <h6 class="fw-bold mb-3">Attendance Distribution</h6>
+ <canvas id="distributionChart" height="200"></canvas>
+ </div>
+ </div>
+ </div>
+ <div class="col-lg-6">
+ <div class="card border-0 shadow-sm">
+ <div class="card-body">
+ <h6 class="fw-bold mb-3">Monthly Trend</h6>
+ <canvas id="monthlyTrendChart" height="200"></canvas>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <!-- Insights -->
+ <div class="card border-0 shadow-sm">
+ <div class="card-body">
+ <h5 class="fw-bold mb-3"><i class="fas fa-lightbulb text-warning me-2"></i>Insights</h5>
+ @if (Model.Insights.Any())
+ {
+ <div class="list-group">
+ @foreach (var insight in Model.Insights)
+ {
+ <div class="list-group-item border-0">
+ <div class="d-flex align-items-center">
+ <i class="fas fa-@(insight.Type == "success" ? "check-circle text-success" : insight.Type == "danger" ? "exclamation-circle text-danger" : insight.Type == "warning" ? "exclamation-triangle text-warning" : "info-circle text-info") me-3 fa-lg"></i>
+ <span>@insight.Message</span>
+ </div>
+ </div>
+ }
+ </div>
+ }
+ else
+ {
+ <p class="text-muted">Add more attendance records to see insights.</p>
+ }
+ </div>
+ </div>
+</div>
+
+<script>
+@if (Model.WeeklyData.Any())
+ {
+ <text>
+ var weeklyCtx = document.getElementById('monthlyTrendChart').getContext('2d');
+ new Chart(weeklyCtx, {
+ type: 'line',
+ data: {
+ labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.WeeklyData.Select(w => w.WeekLabel))),
+ datasets: [{
+ label: 'Attendance %',
+ data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.WeeklyData.Select(w => w.AttendancePercentage))),
+ borderColor: '#6366f1',
+ backgroundColor: 'rgba(99, 102, 241, 0.1)',
+ fill: true,
+ tension: 0.4
+ }]
+ },
+ options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 } } }
+ });
+ </text>
+ }
+
+ var distCtx = document.getElementById('distributionChart').getContext('2d');
+ new Chart(distCtx, {
+ type: 'doughnut',
+ data: {
+ labels: ['Present', 'Absent', 'Cancelled', 'Late', 'Excused'],
+ datasets: [{
+ data: [@Model.Distribution.Present, @Model.Distribution.Absent, @Model.Distribution.Cancelled, @Model.Distribution.Late, @Model.Distribution.Excused],
+ backgroundColor: ['#22c55e', '#ef4444', '#6b7280', '#f59e0b', '#3b82f6']
+ }]
+ },
+ options: { responsive: true }
+ });
+</script>

@@ -1,0 +1,41 @@
+@model Attendly.ViewModels.ChatViewModel
+@{
+ ViewData["Title"] = "Chat";
+ }
+
+<div class="container-fluid px-4 py-4" style="background: #f0f2f5; min-height: 100vh;">
+ <div class="row" style="max-width: 900px; margin: 0 auto;">
+ <div class="col-12">
+ <div class="card border-0 shadow-sm">
+ <div class="card-header bg-white border-0 py-3">
+ <div class="d-flex align-items-center">
+ <div class="rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; font-weight: bold;">
+ @Model.OtherUserName.Substring(0, 1).ToUpper()
+ </div>
+ <div>
+ <h6 class="fw-bold mb-0">@Model.OtherUserName</h6>
+ <small class="text-muted">@(Model.IsOnline ? "Online" : "Offline")</small>
+ </div>
+ </div>
+ </div>
+ <div class="card-body p-0" style="height: 400px; overflow-y: auto;" id="chatMessages">
+ @foreach (var msg in Model.Messages)
+ {
+ <div class="d-flex @(msg.IsMine ? "justify-content-end" : "justify-content-start") px-4 py-2">
+ <div class="rounded px-3 py-2 @(msg.IsMine ? "bg-primary text-white" : "bg-light")" style="max-width: 70%;">
+ <p class="mb-0 small">@msg.Content</p>
+ <small class="@(msg.IsMine ? "text-white-50" : "text-muted")" style="font-size: 0.65rem;">@msg.CreatedAt.ToString("hh:mm tt")</small>
+ </div>
+ </div>
+ }
+ </div>
+ <div class="card-footer bg-white border-0">
+ <form asp-action="Send" asp-route-conversationId="@Model.ConversationId" method="post" class="d-flex gap-2">
+ <input type="text" name="message" class="form-control" placeholder="Type a message..." required autofocus />
+ <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i></button>
+ </form>
+ </div>
+ </div>
+ </div>
+ </div>
+</div>

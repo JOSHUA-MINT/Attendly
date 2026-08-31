@@ -1,0 +1,40 @@
+@using Attendly.Configuration
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="utf-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1" />
+ <title>@ViewData["Title"] - @AppConfig.SiteName</title>
+ <base href="~/" />
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+ <link rel="stylesheet" href="~/css/site.css" />
+ @RenderSection("Styles", required: false)
+</head>
+<body>
+ @{ var path = Context.Request.Path.ToString(); var isDashboard = path.Contains("/Dashboard") || path.Contains("/Subjects")
+ || path.Contains("/Attendance") || path.Contains("/Analytics") || path.Contains("/Timetable")
+ || path.Contains("/Calendar") || path.Contains("/Planner") || path.Contains("/Connect")
+ || path.Contains("/Messages") || path.Contains("/Premium") || path.Contains("/Profile")
+ || path.Contains("/Admin"); }
+
+ @if (isDashboard)
+ {
+ @await Html.PartialAsync("Partials/_Navbar")
+ }
+
+ <main role="main">
+ @RenderBody()
+ </main>
+
+ @if (isDashboard)
+ {
+ @await Html.PartialAsync("Partials/_Footer")
+ }
+
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+ <script src="~/js/site.js"></script>
+ @RenderSection("Scripts", required: false)
+</body>
+</html>

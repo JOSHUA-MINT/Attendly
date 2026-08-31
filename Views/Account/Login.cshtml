@@ -1,0 +1,51 @@
+@model Attendly.ViewModels.LoginViewModel
+@{
+ ViewData["Title"] = "Login - Attendly";
+ }
+<div class="auth-page d-flex align-items-center justify-content-center" style="min-height: 100vh; background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);">
+ <div class="card shadow-lg border-0" style="width: 100%; max-width: 420px; border-radius: 16px;">
+ <div class="card-body p-5">
+ <div class="text-center mb-4">
+ <i class="fas fa-graduation-cap fa-3x text-primary mb-3"></i>
+ <h3 class="fw-bold">Welcome Back</h3>
+ <p class="text-muted">Sign in to your Attendly account</p>
+ </div>
+
+ @if (TempData["Info"] != null)
+ {
+ <div class="alert alert-info">@TempData["Info"]</div>
+ }
+
+ <form asp-action="Login" method="post">
+ <div class="mb-3">
+ <label class="form-label">Email</label>
+ <div class="input-group">
+ <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+ <input asp-for="Email" class="form-control" placeholder="you@college.edu" autofocus />
+ </div>
+ <span asp-validation-for="Email" class="text-danger small"></span>
+ </div>
+ <div class="mb-3">
+ <label class="form-label">Password</label>
+ <div class="input-group">
+ <span class="input-group-text"><i class="fas fa-lock"></i></span>
+ <input asp-for="Password" class="form-control" type="password" placeholder="Your password" />
+ </div>
+ <span asp-validation-for="Password" class="text-danger small"></span>
+ </div>
+ <div class="mb-3 d-flex justify-content-between align-items-center">
+ <div class="form-check">
+ <input asp-for="RememberMe" class="form-check-input" />
+ <label class="form-check-label small">Remember me</label>
+ </div>
+ <a asp-action="ForgotPassword" class="text-decoration-none small">Forgot password?</a>
+ </div>
+ <button type="submit" class="btn btn-primary w-100 py-2">Sign In</button>
+ </form>
+
+ <div class="text-center mt-4">
+ <p class="text-muted small">Don't have an account? <a asp-action="Register" class="text-primary text-decoration-none fw-bold">Sign up</a></p>
+ </div>
+ </div>
+ </div>
+</div>

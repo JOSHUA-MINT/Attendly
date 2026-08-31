@@ -1,0 +1,80 @@
+@model List<Attendly.Models.Connection>
+@{
+    ViewData["Title"] = "My Connections";
+    var sessionUserIdStr = Context.Session.GetString("UserId");
+    Guid.TryParse(sessionUserIdStr, out var currentUserId);
+}
+
+<div class="container-fluid px-4 py-4" style="background: #f0f2f5; min-height: 100vh;">
+ <h3 class="fw-bold mb-4"><i class="fas fa-user-friends text-primary me-2"></i>My Connections</h3>
+
+ @if (ViewBag.Pending != null && ((List<Attendly.Models.Connection>)ViewBag.Pending).Any())
+ {
+ <div class="card border-0 shadow-sm mb-4">
+ <div class="card-header bg-warning bg-opacity-10 border-0">
+ <h5 class="fw-bold mb-0"><i class="fas fa-user-clock text-warning me-2"></i>Pending Requests (@(((List<Attendly.Models.Connection>)ViewBag.Pending).Count))</h5>
+ </div>
+ <div class="card-body">
+ @foreach (var req in (List<Attendly.Models.Connection>)ViewBag.Pending)
+ {
+  var otherUser = req.RequesterId == currentUserId ? req.Receiver : req.Requester;
+ <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+ <div>
+ <strong>@(req.Requester?.FullName ?? req.Receiver?.FullName ?? "User")</strong>
+ <p class="text-muted small mb-0">Wants to connect with you</p>
+ </div>
+ <div class="d-flex gap-2">
+ <form asp-action="Respond" asp-route-id="@req.RequesterId" method="post">
+ <input type="hidden" name="response" value="accept" />
+ <button type="submit" class="btn btn-sm btn-success">Accept</button>
+ </form>
+ <form asp-action="Respond" asp-route-id="@req.RequesterId" method="post">
+ <input type="hidden" name="response" value="reject" />
+ <button type="submit" class="btn btn-sm btn-outline-danger">Decline</button>
+ </form>
+ </div>
+ </div>
+ }
+ </div>
+ </div>
+ }
+
+ <div class="card border-0 shadow-sm">
+ <div class="card-header bg-white border-0 py-3">
+ <h5 class="fw-bold mb-0">Accepted Connections (@Model.Count)</h5>
+ </div>
+ <div class="card-body">
+ @if (Model.Any())
+ {
+ <div class="row g-3">
+ @foreach (var conn in Model)
+ {
+  var otherUser = conn.RequesterId == currentUserId ? conn.Receiver : conn.Requester;
+ <div class="col-md-6">
+ <div class="card border-0 bg-light">
+ <div class="card-body d-flex justify-content-between align-items-center">
+ <div>
+ <strong>@(otherUser?.FullName ?? "User")</strong>
+ <p class="text-muted small mb-0">@otherUser?.Course · @otherUser?.Year</p>
+ </div>
+ <div class="d-flex gap-2">
+ <a asp-controller="Messages" asp-action="StartChat" asp-route-userId="@(conn.RequesterId == currentUserId ? conn.ReceiverId : conn.RequesterId)" class="btn btn-sm btn-primary">
+ <i class="fas fa-comment"></i>
+ </a>
+ <form asp-action="RemoveConnection" asp-route-id="@(conn.RequesterId == currentUserId ? conn.ReceiverId : conn.RequesterId)" method="post">
+ <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-user-times"></i></button>
+ </form>
+ </div>
+ </div>
+ </div>
+ </div>
+ }
+ </div>
+ }
+ else
+ {
+ <p class="text-muted text-center py-4">No connections yet. Browse the Connect page to find students!</p>
+ }
+ </div>
+ </div>
+</div>

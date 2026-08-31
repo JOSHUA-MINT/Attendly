@@ -1,0 +1,53 @@
+@model Attendly.ViewModels.SubjectCreateViewModel
+@{
+ ViewData["Title"] = ViewBag.SubjectId != null ? "Edit Subject" : "Add Subject";
+ }
+
+<div class="container-fluid px-4 py-4" style="background: #f0f2f5; min-height: 100vh;">
+ <div class="row justify-content-center">
+ <div class="col-lg-6">
+ <div class="card border-0 shadow-sm">
+ <div class="card-body p-5">
+ <h3 class="fw-bold mb-4">@(ViewBag.SubjectId != null ? "Edit Subject" : "Add New Subject")</h3>
+
+ <form asp-action="Create" method="post">
+ <div class="mb-3">
+ <label class="form-label">Subject Name *</label>
+ <input asp-for="Name" class="form-control" required />
+ </div>
+ <div class="row g-3">
+ <div class="col-md-6">
+ <label class="form-label">Subject Code</label>
+ <input asp-for="Code" class="form-control" placeholder="e.g. CS501" />
+ </div>
+ <div class="col-md-6">
+ <label class="form-label">Professor / Faculty</label>
+ <input asp-for="Professor" class="form-control" />
+ </div>
+ <div class="col-md-6">
+ <label class="form-label">Room</label>
+ <input asp-for="Room" class="form-control" placeholder="e.g. Room 301" />
+ </div>
+ <div class="col-md-6">
+ <label class="form-label">Lectures Per Week</label>
+ <input asp-for="LecturesPerWeek" class="form-control" type="number" min="1" max="10" value="@Model.LecturesPerWeek" />
+ </div>
+ <div class="col-md-6">
+ <label class="form-label">Target Attendance (%)</label>
+ <input asp-for="TargetPercentage" class="form-control" type="number" min="50" max="100" value="@Model.TargetPercentage" />
+ </div>
+ <div class="col-md-6">
+ <label class="form-label">Color</label>
+ <input asp-for="Color" class="form-control" type="color" value="@Model.Color" style="height: 42px;" />
+ </div>
+ </div>
+ <div class="d-flex gap-2 mt-4">
+ <button type="submit" class="btn btn-primary">@(ViewBag.SubjectId != null ? "Update Subject" : "Add Subject")</button>
+ <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+ </div>
+ </form>
+ </div>
+ </div>
+ </div>
+ </div>
+</div>

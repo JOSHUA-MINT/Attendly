@@ -1,0 +1,82 @@
+@using Attendly.Configuration
+<nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);">
+ <div class="container-fluid">
+ <a class="navbar-brand fw-bold" asp-controller="Dashboard" asp-action="Index">
+ <i class="fas fa-graduation-cap me-2"></i>@AppConfig.SiteName
+ </a>
+ <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+ <span class="navbar-toggler-icon"></span>
+ </button>
+ <div class="collapse navbar-collapse" id="mainNav">
+ <ul class="navbar-nav me-auto">
+ <li class="nav-item">
+ <a class="nav-link @(Context.Request.Path.ToString().Contains("/Dashboard") ? "active" : "")" asp-controller="Dashboard" asp-action="Index">
+ <i class="fas fa-th-large me-1"></i>Dashboard
+ </a>
+ </li>
+ <li class="nav-item">
+ <a class="nav-link @(Context.Request.Path.ToString().Contains("/Subjects") ? "active" : "")" asp-controller="Subjects" asp-action="Index">
+ <i class="fas fa-book me-1"></i>Subjects
+ </a>
+ </li>
+ <li class="nav-item">
+ <a class="nav-link @(Context.Request.Path.ToString().Contains("/Attendance") ? "active" : "")" asp-controller="Attendance" asp-action="Index">
+ <i class="fas fa-clipboard-check me-1"></i>Attendance
+ </a>
+ </li>
+ <li class="nav-item">
+ <a class="nav-link @(Context.Request.Path.ToString().Contains("/Analytics") ? "active" : "")" asp-controller="Analytics" asp-action="Index">
+ <i class="fas fa-chart-bar me-1"></i>Analytics
+ </a>
+ </li>
+ <li class="nav-item">
+ <a class="nav-link @(Context.Request.Path.ToString().Contains("/Timetable") ? "active" : "")" asp-controller="Timetable" asp-action="Index">
+ <i class="fas fa-calendar-alt me-1"></i>Timetable
+ </a>
+ </li>
+ <li class="nav-item">
+ <a class="nav-link @(Context.Request.Path.ToString().Contains("/Calendar") ? "active" : "")" asp-controller="Calendar" asp-action="Index">
+ <i class="fas fa-calendar me-1"></i>Calendar
+ </a>
+ </li>
+ <li class="nav-item">
+ <a class="nav-link @(Context.Request.Path.ToString().Contains("/Planner") ? "active" : "")" asp-controller="Planner" asp-action="Index">
+ <i class="fas fa-plane-departure me-1"></i>Planner
+ </a>
+ </li>
+ <li class="nav-item">
+ <a class="nav-link @(Context.Request.Path.ToString().Contains("/Connect") ? "active" : "")" asp-controller="Connect" asp-action="Index">
+ <i class="fas fa-users me-1"></i>Connect
+ </a>
+ </li>
+ <li class="nav-item">
+ <a class="nav-link @(Context.Request.Path.ToString().Contains("/Messages") ? "active" : "")" asp-controller="Messages" asp-action="Index">
+ <i class="fas fa-comments me-1"></i>Messages
+ </a>
+ </li>
+ </ul>
+ <ul class="navbar-nav">
+ <li class="nav-item">
+ <a class="nav-link @(Context.Request.Path.ToString().Contains("/Premium") ? "active text-warning" : "")" asp-controller="Premium" asp-action="Index">
+ <i class="fas fa-crown me-1"></i>Premium
+ </a>
+ </li>
+ <li class="nav-item dropdown">
+ <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+ <i class="fas fa-user-circle me-1"></i>@(Context.Session.GetString("UserName") ?? "Account")
+ </a>
+ <ul class="dropdown-menu dropdown-menu-dark">
+ <li><a class="dropdown-item" asp-controller="Profile" asp-action="Index"><i class="fas fa-user me-2"></i>Profile</a></li>
+ <li><a class="dropdown-item" asp-controller="Premium" asp-action="Index"><i class="fas fa-crown me-2"></i>Premium</a></li>
+ <li><hr class="dropdown-divider" /></li>
+ <li>
+ <form asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="d-inline">
+ <button type="submit" class="dropdown-item text-danger"><i class="fas fa-sign-out-alt me-2"></i>Logout</button>
+ </form>
+ </li>
+ </ul>
+ </li>
+ </ul>
+ </div>
+ </div>
+</nav>

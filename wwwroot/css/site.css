@@ -1,0 +1,145 @@
+/* ═══════════════════════════════════════════════
+ ATTENDLY - Main Stylesheet
+ ═══════════════════════════════════════════════ */
+
+:root {
+ --primary: #6366f1;
+ --primary-dark: #4f46e5;
+ --secondary: #8b5cf6;
+ --success: #22c55e;
+ --danger: #ef4444;
+ --warning: #f59e0b;
+ --info: #3b82f6;
+ --dark: #0f0c29;
+ --dark-mid: #302b63;
+ --dark-light: #24243e;
+ --bg: #f0f2f5;
+ --card-bg: #ffffff;
+ }
+
+/* ── Base ── */
+* { box-sizing: border-box; }
+
+body {
+ font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, sans-serif;
+ background: var(--bg);
+ color: #1e293b;
+ line-height: 1.6;
+ }
+
+a { text-decoration: none; }
+
+/* ── Hero Section ── */
+.hero-section { position: relative; overflow: hidden; }
+.hero-section::after {
+ content: '';
+ position: absolute;
+ top: 0; left: 0; right: 0; bottom: 0;
+ background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+ pointer-events: none;
+ }
+
+/* ── Attendance Circle ── */
+.attendance-circle {
+ position: relative;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ }
+.attendance-circle > div {
+ position: absolute;
+ }
+
+/* ── Icon Circle ── */
+.icon-circle {
+ width: 60px; height: 60px;
+ border-radius: 16px;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ margin: 0 auto 1rem;
+ }
+
+/* ── Step Circle ── */
+.step-circle {
+ width: 50px; height: 50px;
+ border-radius: 50%;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ font-size: 1.25rem;
+ font-weight: bold;
+ }
+
+/* ── Hover Cards ── */
+.hover-card {
+ transition: transform 0.2s ease, box-shadow 0.2s ease;
+ }
+.hover-card:hover {
+ transform: translateY(-4px);
+ box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+ }
+
+/* ── Auth Pages ── */
+.auth-page { min-height: 100vh; }
+.auth-page .card { animation: fadeInUp 0.5s ease; }
+
+@keyframes fadeInUp {
+ from { opacity: 0; transform: translateY(20px); }
+ to { opacity: 1; transform: translateY(0); }
+ }
+
+/* ── Dashboard ── */
+.dashboard-page { min-height: 100vh; }
+
+.min-height-cell { min-height: 100px; }
+
+/* ── Progress Bars ── */
+.progress { border-radius: 8px; }
+.progress-bar { border-radius: 8px; }
+
+/* ── Navbar ── */
+.navbar-brand { letter-spacing: -0.5px; }
+.nav-link { font-weight: 500; font-size: 0.9rem; transition: color 0.15s; }
+.nav-link:hover, .nav-link.active { color: #818cf8 !important; }
+
+/* ── Cards ── */
+.card { border-radius: 12px; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+.card-hover:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+
+/* ── Buttons ── */
+.btn { border-radius: 8px; font-weight: 500; }
+.btn-primary { background: linear-gradient(135deg, var(--primary), var(--secondary)); border: none; }
+.btn-primary:hover { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); }
+
+/* ── Badges ── */
+.badge { font-weight: 500; }
+
+/* ── Tables ── */
+.table th { font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; }
+
+/* ── Chat ── */
+.chat-bubble-mine {
+ background: linear-gradient(135deg, var(--primary), var(--secondary));
+ color: white;
+ border-radius: 18px 18px 4px 18px;
+ }
+.chat-bubble-other {
+ background: #e2e8f0;
+ border-radius: 18px 18px 18px 4px;
+ }
+
+/* ── Footer ── */
+.footer a:hover { color: #818cf8 !important; }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+ .display-3 { font-size: 2rem; }
+ .display-4 { font-size: 1.75rem; }
+ }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #a1a1a1; }

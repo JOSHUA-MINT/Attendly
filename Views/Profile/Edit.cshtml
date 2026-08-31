@@ -1,0 +1,71 @@
+@model Attendly.ViewModels.ProfileViewModel
+@{
+ ViewData["Title"] = "Edit Profile";
+ }
+
+<div class="container-fluid px-4 py-4" style="background: #f0f2f5; min-height: 100vh;">
+ <div class="row justify-content-center">
+ <div class="col-lg-6">
+ <div class="card border-0 shadow-sm">
+ <div class="card-body p-5">
+ <h3 class="fw-bold mb-4">Edit Profile</h3>
+
+ <form asp-action="Edit" method="post">
+ <div class="row g-3">
+ <div class="col-md-6">
+ <label class="form-label">Full Name</label>
+ <input asp-for="FullName" class="form-control" />
+ </div>
+ <div class="col-md-6">
+ <label class="form-label">Email</label>
+ <input asp-for="Email" class="form-control" disabled />
+ </div>
+ <div class="col-md-6">
+ <label class="form-label">College</label>
+ <input asp-for="College" class="form-control" />
+ </div>
+ <div class="col-md-6">
+ <label class="form-label">Course</label>
+ <input asp-for="Course" class="form-control" />
+ </div>
+ <div class="col-md-4">
+ <label class="form-label">Year</label>
+ <select asp-for="Year" class="form-select">
+ <option value="">Select</option>
+ <option value="FY">First Year</option>
+ <option value="SY">Second Year</option>
+ <option value="TY">Third Year</option>
+ <option value="Final">Final Year</option>
+ </select>
+ </div>
+ <div class="col-md-4">
+ <label class="form-label">Division</label>
+ <input asp-for="Division" class="form-control" />
+ </div>
+ <div class="col-md-4">
+ <label class="form-label">Railway Line</label>
+ <select asp-for="RailwayLine" class="form-select">
+ <option value="">Select</option>
+ <option value="Western">Western Line</option>
+ <option value="Central">Central Line</option>
+ <option value="Other">Other</option>
+ </select>
+ </div>
+ <div class="col-md-6">
+ <label class="form-label">Station</label>
+ <input asp-for="Station" class="form-control" />
+ </div>
+ <div class="col-12">
+ <label class="form-label">Bio</label>
+ <textarea asp-for="Bio" class="form-control" rows="3"></textarea>
+ </div>
+ </div>
+ <div class="d-flex gap-2 mt-4">
+ <button type="submit" class="btn btn-primary">Save Changes</button>
+ <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+ </div>
+ </form>
+ </div>
+ </div>
+ </div>
+</div>

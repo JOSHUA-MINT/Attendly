@@ -1,0 +1,66 @@
+@model Attendly.ViewModels.SkipSimulatorViewModel
+@{
+ ViewData["Title"] = "Can I Skip? Simulator";
+ }
+
+<div class="container-fluid px-4 py-4" style="background: #f0f2f5; min-height: 100vh;">
+ <div class="row justify-content-center">
+ <div class="col-lg-8">
+ <h3 class="fw-bold mb-4"><i class="fas fa-calculator text-primary me-2"></i>Can I Skip? Simulator</h3>
+
+ <div class="card border-0 shadow-sm mb-4">
+ <div class="card-body">
+ <form method="post" asp-action="Simulator" class="row g-3 align-items-end">
+ <div class="col-md-4">
+ <label class="form-label">Subject</label>
+ <select name="subjectId" class="form-select" onchange="this.form.submit()">
+ @foreach (var subj in ViewBag.Subjects as List<Attendly.Models.Subject> ?? new List<Attendly.Models.Subject>())
+ {
+ <option value="@subj.Id" selected="@(subj.Id == ViewBag.SelectedSubjectId)">@subj.Name</option>
+ }
+ </select>
+ </div>
+ <div class="col-md-4">
+ <label class="form-label">Current: @Model.CurrentAttendance.ToString("F1")% | Target: @Model.TargetPercentage%</label>
+ <p class="text-muted small mb-0">@Model.CurrentPresentLectures attended out of @Model.CurrentTotalLectures total</p>
+ </div>
+ </form>
+ </div>
+ </div>
+
+ <div class="card border-0 shadow-sm">
+ <div class="card-body">
+ <h5 class="fw-bold mb-3">Simulation Results (10 upcoming lectures)</h5>
+ <div class="list-group">
+ @foreach (var sim in Model.Simulations)
+ {
+ <div class="list-group-item d-flex justify-content-between align-items-center">
+ <div>
+ <strong>@sim.Message</strong>
+ </div>
+ <span class="badge bg-@(sim.IsSafe ? "success" : "danger") fs-6">@sim.ProjectedAttendance.ToString("F1")%</span>
+ </div>
+ }
+ </div>
+ @if (Model.Simulations.Any())
+ {
+ var maxSafe = Model.Simulations.LastOrDefault(s => s.IsSafe)?.MissedLectures ?? 0;
+ <div class="mt-3 p-3 rounded bg-@(maxSafe > 0 ? "success" : "danger") bg-opacity-10">
+ <p class="mb-0">
+ @if (maxSafe > 0)
+ {
+ <strong>You can safely miss up to @maxSafe of the next 10 lectures.</strong>
+ }
+ else
+ {
+ <strong>Be careful — missing any more lectures may push you below your target!</strong>
+ }
+ </p>
+ </div>
+ }
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+</div>

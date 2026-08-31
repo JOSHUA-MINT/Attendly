@@ -1,0 +1,127 @@
+@{
+ ViewData["Title"] = "Home - " + AppConfig.SiteName;
+ }
+
+ <!-- Hero -->
+ <section class="hero-section text-white" style="min-height: 90vh; display: flex; align-items: center; background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);">
+ <div class="container">
+ <div class="row align-items-center">
+ <div class="col-lg-6">
+ <span class="badge bg-warning text-dark mb-3 px-3 py-2">Smart Student Platform</span>
+ <h1 class="display-3 fw-bold mb-3">
+ Stop guessing<br />your <span style="color: #6366f1;">attendance.</span>
+ </h1>
+ <p class="lead text-white-50 mb-4" style="font-size: 1.2rem;">
+ Track every lecture, understand your attendance, plan your holidays,<br />
+ and connect with students around you.
+ </p>
+ <div class="d-flex gap-3">
+ <a asp-controller="Account" asp-action="Register" class="btn btn-primary btn-lg px-4">
+ Get Started <i class="fas fa-arrow-right ms-2"></i>
+ </a>
+ <a asp-controller="Home" asp-action="Features" class="btn btn-outline-light btn-lg px-4">
+ Explore Features
+ </a>
+ </div>
+ <div class="mt-4 text-white-50 small">
+ <i class="fas fa-check-circle text-success me-2"></i> Free to start
+ <i class="fas fa-check-circle text-success ms-3 me-2"></i> No credit card required
+ </div>
+ </div>
+ <div class="col-lg-6 mt-5 mt-lg-0">
+ <div class="card border-0 shadow-lg" style="background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border-radius: 16px;">
+ <div class="card-body p-4">
+ <div class="text-center mb-4">
+ <h5 class="text-white mb-1">Overall Attendance</h5>
+ <div class="attendance-circle mx-auto" style="width: 140px; height: 140px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: conic-gradient(#22c55e 82.4%, #ef4444 82.4%);">
+ <div style="width: 120px; height: 120px; border-radius: 50%; background: #1e1b4b; display: flex; align-items: center; justify-content: center;">
+ <span class="display-6 fw-bold text-success">82.4%</span>
+ </div>
+ </div>
+ </div>
+ <div class="row g-3">
+ @foreach (var subj in new[] {
+ new { Name = "Database Mgmt", Pct = 82, Status = "SAFE" },
+ new { Name = "C# Programming", Pct = 91, Status = "SAFE" },
+ new { Name = "Networks", Pct = 68, Status = "WARNING" }
+ })
+ {
+ <div class="col-12">
+ <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: rgba(255,255,255,0.05);">
+ <span class="text-white small">@subj.Name</span>
+ <span class="badge @(subj.Status == "SAFE" ? "bg-success" : "bg-warning")">@subj.Status</span>
+ </div>
+ </div>
+ }
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </section>
+
+ <!-- Features -->
+ <section id="features" class="py-5" style="background: #f8f9fc;">
+ <div class="container py-5">
+ <div class="text-center mb-5">
+ <h2 class="fw-bold">Everything You Need</h2>
+ <p class="text-muted lead">The complete student platform for attendance, planning, and campus connections.</p>
+ </div>
+ <div class="row g-4">
+ @foreach (var feature in new[] {
+ new { Icon = "fa-clipboard-check", Title = "Attendance Tracking", Desc = "Mark present, absent, cancelled, late, or excused for every lecture.", Color = "primary" },
+ new { Icon = "fa-chart-pie", Title = "Smart Analytics", Desc = "Detailed insights, trends, and predictions about your attendance patterns.", Color = "success" },
+ new { Icon = "fa-calculator", Title = "Can I Skip?", Desc = "Simulate missing classes and see the real impact on your attendance percentage.", Color = "info" },
+ new { Icon = "fa-plane-departure", Title = "Holiday Planner", Desc = "Plan trips with confidence — know exactly how many classes you'll miss.", Color = "warning" },
+ new { Icon = "fa-calendar-alt", Title = "Extended Weekends", Desc = "Find opportunities for long breaks without hurting your attendance.", Color = "danger" },
+ new { Icon = "fa-users", Title = "Student Connect", Desc = "Find students traveling the same railway line as you.", Color = "primary" },
+ new { Icon = "fa-comments", Title = "Campus Chat", Desc = "Message your connections directly through the platform.", Color = "success" },
+ new { Icon = "fa-crown", Title = "Premium Insights", Desc = "Advanced predictions and detailed monthly reports for serious students.", Color = "warning" }
+ })
+ {
+ <div class="col-md-6 col-lg-3">
+ <div class="card h-100 border-0 shadow-sm hover-card">
+ <div class="card-body text-center p-4">
+ <div class="icon-circle bg-@feature.Color text-white mb-3">
+ <i class="fas @feature.Icon fa-2x"></i>
+ </div>
+ <h5 class="card-title fw-bold">@feature.Title</h5>
+ <p class="card-text text-muted">@feature.Desc</p>
+ </div>
+ </div>
+ </div>
+ }
+ </div>
+ </div>
+ </section>
+
+ <!-- How It Works -->
+ <section id="how-it-works" class="py-5" style="background: white;">
+ <div class="container py-5">
+ <div class="text-center mb-5">
+ <h2 class="fw-bold">How It Works</h2>
+ <p class="text-muted lead">Get started in under 2 minutes.</p>
+ </div>
+ <div class="row g-4">
+ @foreach (var step in new[] {
+ new { Num = "1", Title = "Create Account", Desc = "Sign up with your college details and set up your profile." },
+ new { Num = "2", Title = "Add Subjects", Desc = "Enter your subjects, professors, and timetable." },
+ new { Num = "3", Title = "Mark Attendance", Desc = "Quickly mark attendance for each lecture." },
+ new { Num = "4", Title = "Stay Ahead", Desc = "Use analytics and planners to stay on top of your attendance." }
+ })
+ {
+ <div class="col-md-3 text-center">
+ <div class="step-circle bg-primary text-white mx-auto mb-3">@step.Num</div>
+ <h5>@step.Title</h5>
+ <p class="text-muted">@step.Desc</p>
+ </div>
+ }
+ </div>
+ <div class="text-center mt-5">
+ <a asp-controller="Account" asp-action="Register" class="btn btn-primary btn-lg px-5">
+ Get Started <i class="fas fa-arrow-right ms-2"></i>
+ </a>
+ </div>
+ </div>
+ </section>

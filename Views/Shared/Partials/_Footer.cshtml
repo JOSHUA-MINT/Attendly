@@ -1,0 +1,29 @@
+@using Attendly.Configuration
+<footer class="footer py-4" style="background: #0f0c29; color: #adb5bd;">
+ <div class="container">
+ <div class="row">
+ <div class="col-md-4">
+ <h5 class="text-white"><i class="fas fa-graduation-cap me-2"></i>@AppConfig.SiteName</h5>
+ <p class="small">Know your attendance. Plan your semester. Connect with your campus.</p>
+ </div>
+ <div class="col-md-4">
+ <h6 class="text-white">Quick Links</h6>
+ <ul class="list-unstyled small">
+ <li><a asp-controller="Dashboard" asp-action="Index" class="text-decoration-none text-muted">Dashboard</a></li>
+ <li><a asp-controller="Attendance" asp-action="Index" class="text-decoration-none text-muted">Attendance</a></li>
+ <li><a asp-controller="Analytics" asp-action="Index" class="text-decoration-none text-muted">Analytics</a></li>
+ <li><a asp-controller="Planner" asp-action="Index" class="text-decoration-none text-muted">Holiday Planner</a></li>
+ </ul>
+ </div>
+ <div class="col-md-4">
+ <h6 class="text-white">Legal</h6>
+ <ul class="list-unstyled small">
+ <li><a asp-controller="Home" asp-action="Privacy" class="text-decoration-none text-muted">Privacy Policy</a></li>
+ <li><a asp-controller="Home" asp-action="Terms" class="text-decoration-none text-muted">Terms of Service</a></li>
+ </ul>
+ </div>
+ </div>
+ <hr class="my-3" style="border-color: rgba(255,255,255,0.1);" />
+ <p class="text-center small mb-0">&copy; @DateTime.Now.Year @AppConfig.SiteName. All rights reserved.</p>
+ </div>
+</footer>

@@ -1,0 +1,88 @@
+@model Attendly.ViewModels.HolidaySimulatorViewModel
+@{
+ ViewData["Title"] = "Holiday Simulator";
+ }
+
+<div class="container-fluid px-4 py-4" style="background: #f0f2f5; min-height: 100vh;">
+ <div class="row justify-content-center">
+ <div class="col-lg-8">
+ <h3 class="fw-bold mb-4"><i class="fas fa-calculator text-primary me-2"></i>Holiday Trip Simulator</h3>
+
+ <div class="card border-0 shadow-sm mb-4">
+ <div class="card-body">
+ <form method="post" asp-action="Simulate" class="row g-3 align-items-end">
+ <div class="col-md-4">
+ <label class="form-label">Start Date</label>
+ <input name="startDate" type="date" class="form-control" value="@Model.StartDate.ToString("yyyy-MM-dd")" required />
+ </div>
+ <div class="col-md-4">
+ <label class="form-label">End Date</label>
+ <input name="endDate" type="date" class="form-control" value="@Model.EndDate.ToString("yyyy-MM-dd")" required />
+ </div>
+ <div class="col-md-4">
+ <button type="submit" class="btn btn-primary w-100"><i class="fas fa-calculator me-1"></i>Calculate Impact</button>
+ </div>
+ </form>
+ </div>
+ </div>
+
+ @if (Model.DaysAway > 0)
+ {
+ <div class="row g-3 mb-4">
+ <div class="col-md-3">
+ <div class="card border-0 shadow-sm">
+ <div class="card-body text-center">
+ <h2 class="fw-bold text-primary">@Model.DaysAway</h2>
+ <p class="text-muted mb-0">Days Away</p>
+ </div>
+ </div>
+ </div>
+ <div class="col-md-3">
+ <div class="card border-0 shadow-sm">
+ <div class="card-body text-center">
+ <h2 class="fw-bold text-warning">@Model.LecturesMissed</h2>
+ <p class="text-muted mb-0">Lectures Missed</p>
+ </div>
+ </div>
+ </div>
+ <div class="col-md-3">
+ <div class="card border-0 shadow-sm">
+ <div class="card-body text-center">
+ <h2 class="fw-bold text-info">@Model.CurrentAttendance.ToString("F1")%</h2>
+ <p class="text-muted mb-0">Current Attendance</p>
+ </div>
+ </div>
+ </div>
+ <div class="col-md-3">
+ <div class="card border-0 shadow-sm">
+ <div class="card-body text-center">
+ <h2 class="fw-bold @(Model.IsSafe ? "text-success" : "text-danger")">@Model.ProjectedAttendance.ToString("F1")%</h2>
+ <p class="text-muted mb-0">Projected Attendance</p>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <div class="card border-0 shadow-sm">
+ <div class="card-body">
+ <h5 class="fw-bold mb-3">Trip Analysis</h5>
+ <div class="alert alert-@(Model.IsSafe ? "success" : "danger") border-0">
+ <i class="fas fa-@(Model.IsSafe ? "check-circle" : "exclamation-circle") me-2"></i>
+ @Model.StatusMessage
+ </div>
+ @if (Model.SubjectsAffected.Any())
+ {
+ <p class="mb-1"><strong>Subjects affected:</strong></p>
+ <div class="d-flex flex-wrap gap-2">
+ @foreach (var subj in Model.SubjectsAffected)
+ {
+ <span class="badge bg-secondary">@subj</span>
+ }
+ </div>
+ }
+ </div>
+ </div>
+ }
+ </div>
+ </div>
+</div>
