@@ -10,10 +10,12 @@ namespace Attendly.Controllers;
 public class AdminController : Controller
 {
  private readonly ISupabaseService _supabase;
+ private readonly ILogger<AdminController> _logger;
 
- public AdminController(ISupabaseService supabase)
+ public AdminController(ISupabaseService supabase, ILogger<AdminController> logger)
  {
  _supabase = supabase;
+ _logger = logger;
  }
 
  [HttpGet("")]
@@ -24,37 +26,41 @@ public class AdminController : Controller
 
  var profile = await _supabase.GetProfileByIdAsync(userId.Value);
  if (profile?.Role != "admin")
+ {
+ _logger.LogWarning("Unauthorized admin access attempt by {UserId}", userId.Value);
  return RedirectToAction("Index", "Dashboard");
+ }
 
  var students = await _supabase.GetAllStudentsAsync();
  var reports = await _supabase.GetReportsAsync("pending");
 
-  var recentReports = new List<ReportViewModel>();
-  foreach (var r in reports)
-  {
-      var reporter = await _supabase.GetProfileByIdAsync(r.ReporterId);
-      var reportedUser = await _supabase.GetProfileByIdAsync(r.ReportedUserId);
-      recentReports.Add(new ReportViewModel
-      {
-          Id = r.Id,
-          ReporterName = reporter?.FullName ?? "Unknown",
-          ReportedUserName = reportedUser?.FullName ?? "Unknown",
-          Reason = r.Reason,
-          Status = r.Status,
-          CreatedAt = r.CreatedAt
-      });
-  }
+ var recentReports = new List<ReportViewModel>();
+ foreach (var r in reports)
+ {
+ var reporter = await _supabase.GetProfileByIdAsync(r.ReporterId);
+ var reportedUser = await _supabase.GetProfileByIdAsync(r.ReportedUserId);
+ recentReports.Add(new ReportViewModel
+ {
+ Id = r.Id,
+ ReporterName = reporter?.FullName ?? "Unknown",
+ ReportedUserName = reportedUser?.FullName ?? "Unknown",
+ Reason = r.Reason,
+ Status = r.Status,
+ CreatedAt = r.CreatedAt
+ });
+ }
 
-  var vm = new AdminDashboardViewModel
-  {
-      TotalUsers = students.Count,
-      ActiveUsers = students.Count(s => s.IsActive),
-      PremiumUsers = students.Count(s => s.IsPremium),
-      TotalReports = (await _supabase.GetReportsAsync()).Count,
-      PendingReports = reports.Count,
-      TotalConnections = (await _supabase.GetUserConnectionsAsync(userId.Value)).Count,
-      RecentReports = recentReports
-  };
+ var vm = new AdminDashboardViewModel
+ {
+ TotalUsers = students.Count,
+ ActiveUsers = students.Count(s => s.IsActive),
+ PremiumUsers = students.Count(s => s.IsPremium),
+ TotalReports = (await _supabase.GetReportsAsync()).Count,
+ PendingReports = reports.Count,
+ TotalConnections = 0,
+ TotalMessages = 0,
+ RecentReports = recentReports
+ };
 
  return View(vm);
  }

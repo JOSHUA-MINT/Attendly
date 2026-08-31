@@ -111,13 +111,13 @@ public class MessagesController : Controller
 
  await _supabase.CreateMessageAsync(msg);
 
- // Update conversation last message
+ // Update other user's last_seen
  var conversations = await _supabase.GetUserConversationsAsync(userId.Value);
  var conv = conversations.FirstOrDefault(c => c.Id == conversationId);
  if (conv != null)
  {
- conv.LastMessageAt = DateTime.UtcNow;
- await _supabase.UpdateProfileAsync(new StudentProfile { Id = conv.User1Id, LastSeen = DateTime.UtcNow });
+ var otherId = conv.User1Id == userId.Value ? conv.User2Id : conv.User1Id;
+ await _supabase.UpdateProfileAsync(new StudentProfile { Id = otherId, LastSeen = DateTime.UtcNow });
  }
 
  return RedirectToAction("Chat", new { conversationId });

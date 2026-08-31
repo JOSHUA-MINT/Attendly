@@ -18,7 +18,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
  .AddCookie(options =>
  {
  options.LoginPath = "/Account/Login";
- options.LogoutPath = "/Account/Logout";
+ options.LogoutPath = "/Account/Logout";    
  options.AccessDeniedPath = "/Account/Login";
  options.ExpireTimeSpan = TimeSpan.FromHours(8);
  options.SlidingExpiration = true;
@@ -41,10 +41,10 @@ builder.Services.AddSession(options =>
  options.Cookie.HttpOnly = true;
  options.Cookie.IsEssential = true;
  options.Cookie.SameSite = SameSiteMode.Lax;
- });
+});
 
 // ── Services ──
-builder.Services.AddScoped<ISupabaseService, SupabaseService>();
+builder.Services.AddSingleton<ISupabaseService, SupabaseService>();
 builder.Services.AddScoped<IAttendanceCalculationService, AttendanceCalculationService>();
 builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
 builder.Services.AddScoped<IPlannerService, PlannerService>();
@@ -64,13 +64,6 @@ AppConfig.SupportEmail = builder.Configuration["AppSettings:SupportEmail"] ?? "s
 var app = builder.Build();
 
 // ── Middleware Pipeline ──
-if (!app.Environment.IsDevelopment())
-{
- app.UseExceptionHandler("/Home/Error");
- app.UseHsts();
- }
-
-app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 

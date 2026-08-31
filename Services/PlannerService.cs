@@ -49,8 +49,6 @@ public class PlannerService : IPlannerService
  if (dow > 1 && dow <= 5)
  {
  // Find preceding Friday
- var daysToFriday = dow - 5;
- if (daysToFriday < 0) daysToFriday += 7;
  fridayBefore = holiday.Date.AddDays(-((int)holiday.Date.DayOfWeek - 5));
  if (fridayBefore.DayOfWeek != DayOfWeek.Friday)
  {

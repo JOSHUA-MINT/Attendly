@@ -62,7 +62,7 @@ public class ProfileController : Controller
  var vm = new ProfileViewModel
  {
  Id = profile.Id,
- FullName = profile.FullName,
+ FullName = profile.FullName ?? "",
  Email = profile.Email,
  College = profile.College,
  Course = profile.Course,
@@ -113,7 +113,6 @@ public class ProfileController : Controller
  var profile = await _supabase.GetProfileByIdAsync(id);
  if (profile == null) return NotFound();
 
- var isBlocked = false; // Check if blocked
 
  var vm = new ProfileViewModel
  {

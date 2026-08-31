@@ -26,6 +26,8 @@ public class PremiumController : Controller
  if (userId == null) return RedirectToAction("Login", "Account");
 
  var profile = await _supabase.GetProfileByIdAsync(userId.Value);
+ if (profile == null) return RedirectToAction("Login", "Account");
+
  var subscription = await _supabase.GetUserSubscriptionAsync(userId.Value);
  bool isPremium = false;
  DateTime? expiresAt = null;

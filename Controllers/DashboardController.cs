@@ -22,8 +22,8 @@ public class DashboardController : Controller
  }
 
  [HttpGet("")]
-public async Task<IActionResult> Index()
-{
+ public async Task<IActionResult> Index()
+ {
  var userId = GetCurrentUserId();
  if (userId == null) return RedirectToAction("Login", "Account");
 

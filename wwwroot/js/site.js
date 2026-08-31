@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
  }, 5000);
 
  // ── Confirm delete ──
- document.querySelectorAll('form[onscreen*="confirm"]').forEach(form => {
+ document.querySelectorAll('form[onsubmit*="confirm"]').forEach(form => {
  form.addEventListener('submit', function (e) {
  if (!confirm('Are you sure?')) e.preventDefault();
  });
@@ -54,14 +54,16 @@ document.querySelectorAll('form[required]').forEach(form => {
 });
 
 // ── Loading state for buttons ──
-document.querySelectorAll('button[type="submit"]').forEach(btn => {
- btn.addEventListener('click', function () {
- this.disabled = true;
- const originalText = this.innerHTML;
- this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Processing...';
- setTimeout(() => {
- this.disabled = false;
- this.innerHTML = originalText;
- }, 2000);
+document.querySelectorAll('form').forEach(form => {
+ form.addEventListener('submit', function () {
+ const btn = form.querySelector('button[type="submit"]');
+ if (btn && !btn.dataset.loading) {
+ btn.dataset.loading = "true";
+ btn.disabled = true;
+ const originalText = btn.innerHTML;
+ btn.dataset.original = originalText;
+ btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Processing...';
+ // Don't re-enable — server will redirect on success
+ }
  });
 });
