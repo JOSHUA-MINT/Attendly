@@ -1,6 +1,5 @@
-using Attendly.Data;
-using Attendly.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication;
 using System.Threading.Tasks;
 
 namespace Attendly.Middleware;
@@ -14,17 +13,16 @@ public class SessionMiddleware
  _next = next;
  }
 
- public async Task InvokeAsync(HttpContext context, ISupabaseService supabaseService)
+ public async Task InvokeAsync(HttpContext context)
+ {
+ if (context.Session.IsAvailable && context.User.Identity?.IsAuthenticated == true)
  {
  var userId = context.Session.GetString("UserId");
- var userName = context.Session.GetString("UserName");
-
- if (!string.IsNullOrEmpty(userId))
+ if (string.IsNullOrEmpty(userId))
  {
- context.Items["CurrentUserId"] = Guid.Parse(userId);
- context.Items["CurrentUserName"] = userName;
+ await context.SignOutAsync("Cookies");
  }
-
+ }
  await _next(context);
  }
 }

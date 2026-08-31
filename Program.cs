@@ -2,6 +2,7 @@ using Attendly.Configuration;
 using Attendly.Data;
 using Attendly.Middleware;
 using Attendly.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,19 @@ builder.Services.AddControllersWithViews(options =>
 {
  options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
 });
+
+// ── Authentication (Cookie-based, session-backed) ──
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+ .AddCookie(options =>
+ {
+ options.LoginPath = "/Account/Login";
+ options.LogoutPath = "/Account/Logout";
+ options.AccessDeniedPath = "/Account/Login";
+ options.ExpireTimeSpan = TimeSpan.FromHours(8);
+ options.SlidingExpiration = true;
+ options.Cookie.HttpOnly = true;
+ options.Cookie.IsEssential = true;
+ });
 
 // ── HttpClients ──
 builder.Services.AddHttpClient("Razorpay", client =>
@@ -59,17 +73,16 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-app.UseSession();
-app.UseAuthorization();
 
-// ── Custom Middleware ──
+app.UseSession();
+
+// ── Custom Middleware: sync User principal from session ──
 app.UseMiddleware<SessionMiddleware>();
 
-// ── Routes ──
-app.MapControllerRoute(
- name: "areas",
- pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+app.UseAuthentication();
+app.UseAuthorization();
 
+// ── Routes ──
 app.MapControllerRoute(
  name: "default",
  pattern: "{controller=Home}/{action=Index}/{id?}");
@@ -86,7 +99,7 @@ try
 catch (Exception ex)
 {
  var logger = app.Logger;
- logger.LogWarning(ex, "Supabase initialization failed. App continuing without DB.");
+ logger.LogWarning(ex, "Supabase init failed. App continuing without DB.");
  }
 
 app.Run();

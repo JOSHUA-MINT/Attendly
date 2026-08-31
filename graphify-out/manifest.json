@@ -1,0 +1,452 @@
+{
+  "Attendly.csproj": {
+    "mtime": 1788201811.0453014,
+    "seen": 1788204078.9897635,
+    "ast_hash": "be126f4af3d13a266f1724840afe0eb1",
+    "semantic_hash": "be126f4af3d13a266f1724840afe0eb1"
+  },
+  "Configuration/AppConfiguration.cs": {
+    "mtime": 1788195031.8076534,
+    "seen": 1788204078.989767,
+    "ast_hash": "e47a9e531e9b6e1935c5cba2f625aa85",
+    "semantic_hash": "e47a9e531e9b6e1935c5cba2f625aa85"
+  },
+  "Controllers/AccountController.cs": {
+    "mtime": 1788201891.7169194,
+    "seen": 1788204078.989769,
+    "ast_hash": "227f137095e0fa94d46ccf53b14c1a38",
+    "semantic_hash": "227f137095e0fa94d46ccf53b14c1a38"
+  },
+  "Controllers/AdminController.cs": {
+    "mtime": 1788197972.5636556,
+    "seen": 1788204078.98977,
+    "ast_hash": "f3b787b1b18fe0555d07b50346b74c1d",
+    "semantic_hash": "f3b787b1b18fe0555d07b50346b74c1d"
+  },
+  "Controllers/AnalyticsController.cs": {
+    "mtime": 1788195406.23107,
+    "seen": 1788204078.9897707,
+    "ast_hash": "13ce39f16d8b020ed67326a7afe867d3",
+    "semantic_hash": "13ce39f16d8b020ed67326a7afe867d3"
+  },
+  "Controllers/AttendanceController.cs": {
+    "mtime": 1788195395.6702423,
+    "seen": 1788204078.9897716,
+    "ast_hash": "09301e94b0ec965aaf72f3f404a687ef",
+    "semantic_hash": "09301e94b0ec965aaf72f3f404a687ef"
+  },
+  "Controllers/CalendarController.cs": {
+    "mtime": 1788195439.0575383,
+    "seen": 1788204078.9897726,
+    "ast_hash": "97b09f13d1abfd40f68612ef12245a2e",
+    "semantic_hash": "97b09f13d1abfd40f68612ef12245a2e"
+  },
+  "Controllers/ConnectController.cs": {
+    "mtime": 1788195472.7609978,
+    "seen": 1788204078.989773,
+    "ast_hash": "5339df67212623f833a8e834e89721e7",
+    "semantic_hash": "5339df67212623f833a8e834e89721e7"
+  },
+  "Controllers/DashboardController.cs": {
+    "mtime": 1788197920.0855684,
+    "seen": 1788204078.9897738,
+    "ast_hash": "29d17ac191e6dd0ad1a9b76558671484",
+    "semantic_hash": "29d17ac191e6dd0ad1a9b76558671484"
+  },
+  "Controllers/HomeController.cs": {
+    "mtime": 1788195554.8527029,
+    "seen": 1788204078.9897747,
+    "ast_hash": "2a56a0da5ea08ebd36db43638dc7325b",
+    "semantic_hash": "2a56a0da5ea08ebd36db43638dc7325b"
+  },
+  "Controllers/MessagesController.cs": {
+    "mtime": 1788198007.6280494,
+    "seen": 1788204078.9897754,
+    "ast_hash": "bb527da46db0425eadbaa1efad52fc65",
+    "semantic_hash": "bb527da46db0425eadbaa1efad52fc65"
+  },
+  "Controllers/PlannerController.cs": {
+    "mtime": 1788197911.4277196,
+    "seen": 1788204078.9897764,
+    "ast_hash": "db37c1113d862b452bf90f1cf6d51190",
+    "semantic_hash": "db37c1113d862b452bf90f1cf6d51190"
+  },
+  "Controllers/PremiumController.cs": {
+    "mtime": 1788195506.1544676,
+    "seen": 1788204078.9897768,
+    "ast_hash": "8713ec840ea181ec7d25f1e1f6cbdd3f",
+    "semantic_hash": "8713ec840ea181ec7d25f1e1f6cbdd3f"
+  },
+  "Controllers/ProfileController.cs": {
+    "mtime": 1788195524.6941752,
+    "seen": 1788204078.9897776,
+    "ast_hash": "8f64f5d895579bdbab26aefb8f082dc0",
+    "semantic_hash": "8f64f5d895579bdbab26aefb8f082dc0"
+  },
+  "Controllers/SubjectsController.cs": {
+    "mtime": 1788195370.0326633,
+    "seen": 1788204078.9897785,
+    "ast_hash": "761c4384760efff388a1c19e7beda233",
+    "semantic_hash": "761c4384760efff388a1c19e7beda233"
+  },
+  "Controllers/TimetableController.cs": {
+    "mtime": 1788195426.3757432,
+    "seen": 1788204078.989779,
+    "ast_hash": "5698df6d5c584c4f2e2a6e21811f8eb7",
+    "semantic_hash": "5698df6d5c584c4f2e2a6e21811f8eb7"
+  },
+  "Data/ISupabaseService.cs": {
+    "mtime": 1788197663.4531546,
+    "seen": 1788204078.9897797,
+    "ast_hash": "1d345cbe130eca7a887f1b1a035e0f40",
+    "semantic_hash": "1d345cbe130eca7a887f1b1a035e0f40"
+  },
+  "Data/SupabaseService.cs": {
+    "mtime": 1788198264.6136808,
+    "seen": 1788204078.9897802,
+    "ast_hash": "d2566c190c916ca8ced40406ae1b3910",
+    "semantic_hash": "d2566c190c916ca8ced40406ae1b3910"
+  },
+  "Data/migrations/001_initial_schema.sql": {
+    "mtime": 1788196319.1135304,
+    "seen": 1788204078.989781,
+    "ast_hash": "11194987a54c22128cf5830b94b274dd",
+    "semantic_hash": "11194987a54c22128cf5830b94b274dd"
+  },
+  "Middleware/SessionMiddleware.cs": {
+    "mtime": 1788202014.3698204,
+    "seen": 1788204078.9897819,
+    "ast_hash": "b30ead09c69116888e3b541a67a95a45",
+    "semantic_hash": "b30ead09c69116888e3b541a67a95a45"
+  },
+  "Models/AttendanceRecord.cs": {
+    "mtime": 1788197806.7775655,
+    "seen": 1788204078.9897823,
+    "ast_hash": "31acc848b58a4a3e67ba073f5707b30b",
+    "semantic_hash": "31acc848b58a4a3e67ba073f5707b30b"
+  },
+  "Models/CalendarEvent.cs": {
+    "mtime": 1788197814.7504237,
+    "seen": 1788204078.989783,
+    "ast_hash": "be712f068cadb5bfc6e471e9dc022670",
+    "semantic_hash": "be712f068cadb5bfc6e471e9dc022670"
+  },
+  "Models/Connection.cs": {
+    "mtime": 1788197822.0602937,
+    "seen": 1788204078.989784,
+    "ast_hash": "8972f89950d1ad2e168e34e701fd3903",
+    "semantic_hash": "8972f89950d1ad2e168e34e701fd3903"
+  },
+  "Models/Conversation.cs": {
+    "mtime": 1788197825.6322303,
+    "seen": 1788204078.9897845,
+    "ast_hash": "a29830fe9375f5b76db396b17bfb2ff8",
+    "semantic_hash": "a29830fe9375f5b76db396b17bfb2ff8"
+  },
+  "Models/Holiday.cs": {
+    "mtime": 1788197818.4523578,
+    "seen": 1788204078.9897854,
+    "ast_hash": "c5b8057188d5217dd1621879a088d301",
+    "semantic_hash": "c5b8057188d5217dd1621879a088d301"
+  },
+  "Models/Message.cs": {
+    "mtime": 1788197829.2324276,
+    "seen": 1788204078.989786,
+    "ast_hash": "aa084e3d87cdf1a8ef6a632ec1fae601",
+    "semantic_hash": "aa084e3d87cdf1a8ef6a632ec1fae601"
+  },
+  "Models/Report.cs": {
+    "mtime": 1788197832.817103,
+    "seen": 1788204078.9897866,
+    "ast_hash": "618a90f957f344e370130b385e587b63",
+    "semantic_hash": "618a90f957f344e370130b385e587b63"
+  },
+  "Models/StudentProfile.cs": {
+    "mtime": 1788197798.7507083,
+    "seen": 1788204078.9897873,
+    "ast_hash": "70f28676d2f4c321dfcae11de71b1823",
+    "semantic_hash": "70f28676d2f4c321dfcae11de71b1823"
+  },
+  "Models/Subject.cs": {
+    "mtime": 1788197802.6336393,
+    "seen": 1788204078.9897878,
+    "ast_hash": "07e2c4ceac49fd480c4e3222169de60b",
+    "semantic_hash": "07e2c4ceac49fd480c4e3222169de60b"
+  },
+  "Models/Subscription.cs": {
+    "mtime": 1788197836.4070394,
+    "seen": 1788204078.9897888,
+    "ast_hash": "4d892f4be357da474609de67013e6651",
+    "semantic_hash": "4d892f4be357da474609de67013e6651"
+  },
+  "Models/TimetableEntry.cs": {
+    "mtime": 1788197811.0744889,
+    "seen": 1788204078.9897895,
+    "ast_hash": "d1d32bf6985e0c86e207fd4e26bc8d22",
+    "semantic_hash": "d1d32bf6985e0c86e207fd4e26bc8d22"
+  },
+  "Program.cs": {
+    "mtime": 1788201314.6091588,
+    "seen": 1788204078.98979,
+    "ast_hash": "5dc1fcb255acbc7123386dff829c41a2",
+    "semantic_hash": "5dc1fcb255acbc7123386dff829c41a2"
+  },
+  "Services/AnalyticsService.cs": {
+    "mtime": 1788197867.7454863,
+    "seen": 1788204078.9897907,
+    "ast_hash": "7dc7886b654b5d65ee7fe224b6914b34",
+    "semantic_hash": "7dc7886b654b5d65ee7fe224b6914b34"
+  },
+  "Services/AttendanceCalculationService.cs": {
+    "mtime": 1788198003.9751124,
+    "seen": 1788204078.9897912,
+    "ast_hash": "ef126f030e1d6369ea287bf623528a79",
+    "semantic_hash": "ef126f030e1d6369ea287bf623528a79"
+  },
+  "Services/PlannerService.cs": {
+    "mtime": 1788195273.7412791,
+    "seen": 1788204078.989792,
+    "ast_hash": "185753e5712539bd270b58fc2f70f576",
+    "semantic_hash": "185753e5712539bd270b58fc2f70f576"
+  },
+  "Services/RazorpayService.cs": {
+    "mtime": 1788195283.6761098,
+    "seen": 1788204078.9897926,
+    "ast_hash": "19ce116af51b785f95396de576043aae",
+    "semantic_hash": "19ce116af51b785f95396de576043aae"
+  },
+  "ViewModels/ViewModels.cs": {
+    "mtime": 1788197934.4323182,
+    "seen": 1788204078.9897933,
+    "ast_hash": "63aa7539478d05560a2ecd15ca692474",
+    "semantic_hash": "63aa7539478d05560a2ecd15ca692474"
+  },
+  "Views/Account/ForgotPassword.cshtml": {
+    "mtime": 1788201434.41947,
+    "seen": 1788204078.989794,
+    "ast_hash": "bfa06ec9ac70d18b9e645b6dca03b6ab",
+    "semantic_hash": "bfa06ec9ac70d18b9e645b6dca03b6ab"
+  },
+  "Views/Account/Login.cshtml": {
+    "mtime": 1788201872.8192434,
+    "seen": 1788204078.9897945,
+    "ast_hash": "b51ca90fa5aa4e1e5ec57a5eac079317",
+    "semantic_hash": "b51ca90fa5aa4e1e5ec57a5eac079317"
+  },
+  "Views/Account/Register.cshtml": {
+    "mtime": 1788201214.6656623,
+    "seen": 1788204078.9897954,
+    "ast_hash": "240b3f5f5130c9bd584ab648aec6f086",
+    "semantic_hash": "240b3f5f5130c9bd584ab648aec6f086"
+  },
+  "Views/Admin/Index.cshtml": {
+    "mtime": 1788196106.0895398,
+    "seen": 1788204078.989796,
+    "ast_hash": "e8891d4e6b04aaf0d7ce723206b2d594",
+    "semantic_hash": "e8891d4e6b04aaf0d7ce723206b2d594"
+  },
+  "Views/Admin/ManageHolidays.cshtml": {
+    "mtime": 1788196122.868301,
+    "seen": 1788204078.9897966,
+    "ast_hash": "c534c4626e884e18b9de6a36aa013eed",
+    "semantic_hash": "c534c4626e884e18b9de6a36aa013eed"
+  },
+  "Views/Admin/ManageReports.cshtml": {
+    "mtime": 1788196136.504107,
+    "seen": 1788204078.989797,
+    "ast_hash": "988b919c8df547643ca3e780de1db46d",
+    "semantic_hash": "988b919c8df547643ca3e780de1db46d"
+  },
+  "Views/Analytics/Index.cshtml": {
+    "mtime": 1788195855.807158,
+    "seen": 1788204078.9897983,
+    "ast_hash": "f1bfa0c5fffa5d617bf6d9ad8442ad45",
+    "semantic_hash": "f1bfa0c5fffa5d617bf6d9ad8442ad45"
+  },
+  "Views/Attendance/Criteria.cshtml": {
+    "mtime": 1788195817.7037194,
+    "seen": 1788204078.9897993,
+    "ast_hash": "fc83fa1302c3b21555c359a57de9ac23",
+    "semantic_hash": "fc83fa1302c3b21555c359a57de9ac23"
+  },
+  "Views/Attendance/Index.cshtml": {
+    "mtime": 1788195791.0261145,
+    "seen": 1788204078.9897997,
+    "ast_hash": "6eec0c076540439fc275ea0315d5db2f",
+    "semantic_hash": "6eec0c076540439fc275ea0315d5db2f"
+  },
+  "Views/Attendance/Mark.cshtml": {
+    "mtime": 1788195776.3773322,
+    "seen": 1788204078.9898005,
+    "ast_hash": "267cfaa983608fd7a75ac0c798bd5208",
+    "semantic_hash": "267cfaa983608fd7a75ac0c798bd5208"
+  },
+  "Views/Attendance/SkipSimulator.cshtml": {
+    "mtime": 1788195807.4088717,
+    "seen": 1788204078.9898033,
+    "ast_hash": "bc56f0ffcfe63449f112e42b54c645e9",
+    "semantic_hash": "bc56f0ffcfe63449f112e42b54c645e9"
+  },
+  "Views/Calendar/Index.cshtml": {
+    "mtime": 1788195939.739932,
+    "seen": 1788204078.9898038,
+    "ast_hash": "a6462349cd1684de755422c404ae2b4e",
+    "semantic_hash": "a6462349cd1684de755422c404ae2b4e"
+  },
+  "Views/Connect/Connections.cshtml": {
+    "mtime": 1788197782.1630046,
+    "seen": 1788204078.9898045,
+    "ast_hash": "ab8aadccb4e1828625f1ae96c2ff1117",
+    "semantic_hash": "ab8aadccb4e1828625f1ae96c2ff1117"
+  },
+  "Views/Connect/Index.cshtml": {
+    "mtime": 1788195993.0401607,
+    "seen": 1788204078.989805,
+    "ast_hash": "ee5beccdfc7a8be5c99871cbdebcfdf8",
+    "semantic_hash": "ee5beccdfc7a8be5c99871cbdebcfdf8"
+  },
+  "Views/Dashboard/Index.cshtml": {
+    "mtime": 1788195725.5490923,
+    "seen": 1788204078.989806,
+    "ast_hash": "64a1f487c9cbf2a26129c4638f33d872",
+    "semantic_hash": "64a1f487c9cbf2a26129c4638f33d872"
+  },
+  "Views/Home/Features.cshtml": {
+    "mtime": 1788196192.3943145,
+    "seen": 1788204078.9898064,
+    "ast_hash": "ef4a06f67dab7db71096b5bab3642326",
+    "semantic_hash": "ef4a06f67dab7db71096b5bab3642326"
+  },
+  "Views/Home/Index.cshtml": {
+    "mtime": 1788195658.9400995,
+    "seen": 1788204078.9898071,
+    "ast_hash": "7881bec6a0edbb6a64e14fe730001d54",
+    "semantic_hash": "7881bec6a0edbb6a64e14fe730001d54"
+  },
+  "Views/Home/Privacy.cshtml": {
+    "mtime": 1788196203.242161,
+    "seen": 1788204078.9898076,
+    "ast_hash": "bcedd678013c6a4f20deaf516e7d11ae",
+    "semantic_hash": "bcedd678013c6a4f20deaf516e7d11ae"
+  },
+  "Views/Home/Terms.cshtml": {
+    "mtime": 1788196215.5189877,
+    "seen": 1788204078.989808,
+    "ast_hash": "eefd2039db1cd0ed0e9d4fbaed452070",
+    "semantic_hash": "eefd2039db1cd0ed0e9d4fbaed452070"
+  },
+  "Views/Messages/Chat.cshtml": {
+    "mtime": 1788196030.244625,
+    "seen": 1788204078.9898088,
+    "ast_hash": "54d616a7ccbd7d6f385cc6751052636c",
+    "semantic_hash": "54d616a7ccbd7d6f385cc6751052636c"
+  },
+  "Views/Messages/Index.cshtml": {
+    "mtime": 1788196005.2619846,
+    "seen": 1788204078.9898095,
+    "ast_hash": "e6a1bbf0549a3a74a8c9c316466e5ec4",
+    "semantic_hash": "e6a1bbf0549a3a74a8c9c316466e5ec4"
+  },
+  "Views/Planner/Index.cshtml": {
+    "mtime": 1788195957.7936702,
+    "seen": 1788204078.9898102,
+    "ast_hash": "2330b74c5d964293752ebdeed2823d54",
+    "semantic_hash": "2330b74c5d964293752ebdeed2823d54"
+  },
+  "Views/Planner/Simulate.cshtml": {
+    "mtime": 1788195973.159448,
+    "seen": 1788204078.9898107,
+    "ast_hash": "b4a178ff25868b8c1333829fb464f18c",
+    "semantic_hash": "b4a178ff25868b8c1333829fb464f18c"
+  },
+  "Views/Premium/Index.cshtml": {
+    "mtime": 1788196057.7372308,
+    "seen": 1788204078.9898114,
+    "ast_hash": "c1dd764f1f0c41a4f6460f0191339d21",
+    "semantic_hash": "c1dd764f1f0c41a4f6460f0191339d21"
+  },
+  "Views/Profile/Edit.cshtml": {
+    "mtime": 1788196089.4767768,
+    "seen": 1788204078.989812,
+    "ast_hash": "b095013996398cbfcbf278fb86d81dfd",
+    "semantic_hash": "b095013996398cbfcbf278fb86d81dfd"
+  },
+  "Views/Profile/Index.cshtml": {
+    "mtime": 1788196075.3859782,
+    "seen": 1788204078.9898129,
+    "ast_hash": "599a629733163fdd63f415b338952db8",
+    "semantic_hash": "599a629733163fdd63f415b338952db8"
+  },
+  "Views/Shared/Partials/_Footer.cshtml": {
+    "mtime": 1788195622.6226544,
+    "seen": 1788204078.9898133,
+    "ast_hash": "4ec4744cd6af9858656d42ee08aafe86",
+    "semantic_hash": "4ec4744cd6af9858656d42ee08aafe86"
+  },
+  "Views/Shared/Partials/_Navbar.cshtml": {
+    "mtime": 1788195611.8948193,
+    "seen": 1788204078.9898138,
+    "ast_hash": "5e4282deba1845e3ffa724cda83412a3",
+    "semantic_hash": "5e4282deba1845e3ffa724cda83412a3"
+  },
+  "Views/Shared/_Layout.cshtml": {
+    "mtime": 1788195594.285091,
+    "seen": 1788204078.9898145,
+    "ast_hash": "5e7e20f5ae347563c898ae255b6090b3",
+    "semantic_hash": "5e7e20f5ae347563c898ae255b6090b3"
+  },
+  "Views/Subjects/Create.cshtml": {
+    "mtime": 1788195759.288587,
+    "seen": 1788204078.989815,
+    "ast_hash": "8679786d0bf1af756877810ce222e3db",
+    "semantic_hash": "8679786d0bf1af756877810ce222e3db"
+  },
+  "Views/Subjects/Index.cshtml": {
+    "mtime": 1788195743.0848293,
+    "seen": 1788204078.9898157,
+    "ast_hash": "81d6b7181b19df6b1bdd2211b7ce55f4",
+    "semantic_hash": "81d6b7181b19df6b1bdd2211b7ce55f4"
+  },
+  "Views/Timetable/Index.cshtml": {
+    "mtime": 1788195871.0529342,
+    "seen": 1788204078.9898167,
+    "ast_hash": "804972e1846a863e92b967fca96f8816",
+    "semantic_hash": "804972e1846a863e92b967fca96f8816"
+  },
+  "Views/_ViewImports.cshtml": {
+    "mtime": 1788196265.7632794,
+    "seen": 1788204078.9898171,
+    "ast_hash": "301a3ef686a68bab04e64d330f1f4fa1",
+    "semantic_hash": "301a3ef686a68bab04e64d330f1f4fa1"
+  },
+  "Views/_ViewStart.cshtml": {
+    "mtime": 1788196164.5517087,
+    "seen": 1788204078.9898179,
+    "ast_hash": "111b86ed4907dab8e274c182afb8dd71",
+    "semantic_hash": "111b86ed4907dab8e274c182afb8dd71"
+  },
+  "appsettings.Development.json": {
+    "mtime": 1788196957.1899633,
+    "seen": 1788204078.9898183,
+    "ast_hash": "3cb1db3fba67bb64037a7cf56c423af4",
+    "semantic_hash": "3cb1db3fba67bb64037a7cf56c423af4"
+  },
+  "appsettings.json": {
+    "mtime": 1788196939.2389905,
+    "seen": 1788204078.989819,
+    "ast_hash": "3cb1db3fba67bb64037a7cf56c423af4",
+    "semantic_hash": "3cb1db3fba67bb64037a7cf56c423af4"
+  },
+  "setup.sh": {
+    "mtime": 1788197010.6576464,
+    "seen": 1788204078.98982,
+    "ast_hash": "f4102e9f8a002cae9f28f65a051d6200",
+    "semantic_hash": "f4102e9f8a002cae9f28f65a051d6200"
+  },
+  "wwwroot/js/site.js": {
+    "mtime": 1788196257.7763917,
+    "seen": 1788204078.9898205,
+    "ast_hash": "5e4000b998ef718190d6b2fcbd930914",
+    "semantic_hash": "5e4000b998ef718190d6b2fcbd930914"
+  }
+}
