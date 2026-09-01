@@ -22,13 +22,10 @@ public class AccountController : Controller
  [HttpGet]
  public IActionResult Register()
  {
- if (User.Identity?.IsAuthenticated == true)
- return RedirectToAction("Index", "Dashboard");
  return View(new RegisterViewModel());
  }
 
  [HttpPost]
- [ValidateAntiForgeryToken]
  public async Task<IActionResult> Register(RegisterViewModel model)
  {
  if (!ModelState.IsValid)
@@ -56,53 +53,60 @@ public class AccountController : Controller
  CreatedAt = DateTime.UtcNow
  };
 
- await _supabase.CreateProfileAsync(profile);
+        var created = await _supabase.CreateProfileAsync(profile);
 
- _logger.LogInformation("New user registered: {Email}", model.Email);
+        _logger.LogInformation("New user registered: {Email}, Id={Id}", model.Email, created?.Id ?? profile.Id);
 
- // Auto-login after registration
- await SignInUser(profile);
+        // Auto-login after registration
+        await SignInUser(created ?? profile);
 
- TempData["Success"] = "Welcome to Attendly! Let's get you started.";
- return RedirectToAction("Index", "Dashboard");
+        TempData["Success"] = "Welcome to Attendly! Let's get you started.";
+        return RedirectToAction("Index", "Dashboard");
  }
 
  [HttpGet]
  public IActionResult Login()
  {
- if (User.Identity?.IsAuthenticated == true)
- return RedirectToAction("Index", "Dashboard");
  return View(new LoginViewModel());
  }
 
  [HttpPost]
- [ValidateAntiForgeryToken]
  public async Task<IActionResult> Login(LoginViewModel model)
  {
+ _logger.LogInformation("Login POST hit: Email={Email}, ModelStateValid={Valid}",
+ model.Email, ModelState.IsValid);
+
  if (!ModelState.IsValid)
+ {
+ _logger.LogWarning("Login ModelState invalid: {Errors}",
+ string.Join("; ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)));
  return View(model);
+ }
 
  var profile = await _supabase.GetProfileByEmailAsync(model.Email);
  if (profile == null || !BCrypt.Net.BCrypt.Verify(model.Password, profile.PasswordHash))
  {
+ _logger.LogWarning("Login failed: email={Email}, profileFound={Found}", model.Email, profile != null);
  ModelState.AddModelError(string.Empty, "Invalid email or password.");
  return View(model);
  }
 
  if (!profile.IsActive)
  {
+ _logger.LogWarning("Login blocked: account deactivated, email={Email}", model.Email);
  ModelState.AddModelError(string.Empty, "Your account has been deactivated.");
  return View(model);
  }
 
+ _logger.LogInformation("Login success: signing in user {Email}, Role={Role}", profile.Email, profile.Role);
  await SignInUser(profile);
 
- _logger.LogInformation("User logged in: {Email}", profile.Email);
+ _logger.LogInformation("Login redirecting to Dashboard for {Email}", profile.Email);
  return RedirectToAction("Index", "Dashboard");
  }
 
+ [HttpGet]
  [HttpPost]
- [ValidateAntiForgeryToken]
  public async Task<IActionResult> Logout()
  {
  await HttpContext.SignOutAsync();
@@ -114,8 +118,6 @@ public class AccountController : Controller
  [HttpGet]
  public IActionResult Onboarding(Guid? userId)
  {
- if (!User.Identity?.IsAuthenticated == true)
- return RedirectToAction("Register");
  return View();
  }
 
@@ -126,7 +128,6 @@ public class AccountController : Controller
  }
 
  [HttpPost]
- [ValidateAntiForgeryToken]
  public async Task<IActionResult> ForgotPassword(string email)
  {
  var profile = await _supabase.GetProfileByEmailAsync(email);
@@ -144,7 +145,8 @@ public class AccountController : Controller
  // ── Helper: create auth cookie from profile ──
  private async Task SignInUser(StudentProfile profile)
  {
- HttpContext.Session.SetString("UserId", profile.Id.ToString());
+ var userId = profile.Id.ToString();
+ HttpContext.Session.SetString("UserId", userId);
  HttpContext.Session.SetString("UserName", profile.FullName ?? "Student");
  HttpContext.Session.SetString("UserEmail", profile.Email);
  HttpContext.Session.SetString("UserRole", profile.Role ?? "student");
@@ -155,12 +157,15 @@ public class AccountController : Controller
  new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.NameIdentifier, profile.Id.ToString()),
  new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, profile.FullName ?? "Student"),
  new System.Security.Claims.Claim("UserEmail", profile.Email),
- new System.Security.Claims.Claim("UserRole", profile.Role ?? "student")
+ new System.Security.Claims.Claim("UserRole", profile.Role ?? "student"),
+ new System.Security.Claims.Claim("IsPremium", profile.IsPremium.ToString())
  };
 
  var identity = new System.Security.Claims.ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
  var principal = new System.Security.Claims.ClaimsPrincipal(identity);
 
  await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+ _logger.LogInformation("SignInUser: UserId={UserId}, SessionId={SessionId}",
+ userId, HttpContext.Session.Id ?? "null");
  }
 }

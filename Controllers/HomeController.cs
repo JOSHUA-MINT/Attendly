@@ -25,20 +25,6 @@ public class HomeController : Controller
  return View();
  }
 
- [HttpGet("premium")]
- public IActionResult Premium()
- {
- return RedirectToAction("Index", "Premium");
- }
-
- [HttpGet("connect")]
- public IActionResult Connect()
- {
- if (User.Identity?.IsAuthenticated != true)
- return RedirectToAction("Login", "Account");
- return RedirectToAction("Index", "Connect");
- }
-
  [HttpGet("privacy")]
  public IActionResult Privacy()
  {

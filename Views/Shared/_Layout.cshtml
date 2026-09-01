@@ -12,11 +12,21 @@
  @RenderSection("Styles", required: false)
 </head>
 <body>
- @{ var path = Context.Request.Path.ToString(); var isDashboard = path.Contains("/Dashboard") || path.Contains("/Subjects")
- || path.Contains("/Attendance") || path.Contains("/Analytics") || path.Contains("/Timetable")
- || path.Contains("/Calendar") || path.Contains("/Planner") || path.Contains("/Connect")
- || path.Contains("/Messages") || path.Contains("/Premium") || path.Contains("/Profile")
- || path.Contains("/Admin"); }
+    @{
+        var path = Context.Request.Path.Value ?? "";
+        var isDashboard = path.Contains("/dashboard", StringComparison.OrdinalIgnoreCase)
+            || path.Contains("/subjects", StringComparison.OrdinalIgnoreCase)
+            || path.Contains("/attendance", StringComparison.OrdinalIgnoreCase)
+            || path.Contains("/analytics", StringComparison.OrdinalIgnoreCase)
+            || path.Contains("/timetable", StringComparison.OrdinalIgnoreCase)
+            || path.Contains("/calendar", StringComparison.OrdinalIgnoreCase)
+            || path.Contains("/planner", StringComparison.OrdinalIgnoreCase)
+            || path.Contains("/connect", StringComparison.OrdinalIgnoreCase)
+            || path.Contains("/messages", StringComparison.OrdinalIgnoreCase)
+            || path.Contains("/premium", StringComparison.OrdinalIgnoreCase)
+            || path.Contains("/profile", StringComparison.OrdinalIgnoreCase)
+            || path.Contains("/admin", StringComparison.OrdinalIgnoreCase);
+    }
 
  @if (isDashboard)
  {

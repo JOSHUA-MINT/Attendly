@@ -39,18 +39,25 @@ public class AnalyticsController : Controller
  return View(vm);
  }
 
- private Guid? GetCurrentUserId()
- {
- var id = HttpContext.Session.GetString("UserId");
- if (Guid.TryParse(id, out var guid)) return guid;
- return null;
- }
+    private Guid? GetCurrentUserId()
+    {
+        var claimId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (!string.IsNullOrEmpty(claimId) && Guid.TryParse(claimId, out var claimGuid))
+        {
+            return claimGuid;
+        }
+        var id = HttpContext.Session.GetString("UserId");
+        if (Guid.TryParse(id, out var guid)) return guid;
+        return null;
+    }
 
- private bool IsUserPremium()
- {
- var exp = HttpContext.Session.GetString("PremiumExpiresAt");
- if (string.IsNullOrEmpty(exp)) return false;
- if (DateTime.TryParse(exp, out var expDate)) return expDate > DateTime.UtcNow;
- return false;
- }
+    private bool IsUserPremium()
+    {
+        var isPrem = HttpContext.Session.GetString("IsPremium") ?? User.FindFirst("IsPremium")?.Value;
+        if (bool.TryParse(isPrem, out var b) && b) return true;
+        var exp = HttpContext.Session.GetString("PremiumExpiresAt");
+        if (string.IsNullOrEmpty(exp)) return false;
+        if (DateTime.TryParse(exp, out var expDate)) return expDate > DateTime.UtcNow;
+        return false;
+    }
 }

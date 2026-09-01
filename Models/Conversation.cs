@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using Supabase.Postgrest.Attributes;
 using Supabase.Postgrest.Models;
 
@@ -14,10 +16,16 @@ public class Conversation : BaseModel
 
     [Column("user1_id")]
     public Guid User1Id { get; set; }
+
+    [Newtonsoft.Json.JsonIgnore]
+    [System.Text.Json.Serialization.JsonIgnore]
     public StudentProfile? User1 { get; set; }
 
     [Column("user2_id")]
     public Guid User2Id { get; set; }
+
+    [Newtonsoft.Json.JsonIgnore]
+    [System.Text.Json.Serialization.JsonIgnore]
     public StudentProfile? User2 { get; set; }
 
     [Column("created_at")]
@@ -26,5 +34,7 @@ public class Conversation : BaseModel
     [Column("last_message_at")]
     public DateTime? LastMessageAt { get; set; }
 
+    [Newtonsoft.Json.JsonIgnore]
+    [System.Text.Json.Serialization.JsonIgnore]
     public List<Message>? Messages { get; set; }
 }

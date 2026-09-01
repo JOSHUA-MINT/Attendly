@@ -157,10 +157,15 @@ public class ConnectController : Controller
  return RedirectToAction("Connections");
  }
 
- private Guid? GetCurrentUserId()
- {
- var id = HttpContext.Session.GetString("UserId");
- if (Guid.TryParse(id, out var guid)) return guid;
- return null;
- }
+    private Guid? GetCurrentUserId()
+    {
+        var claimId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (!string.IsNullOrEmpty(claimId) && Guid.TryParse(claimId, out var claimGuid))
+        {
+            return claimGuid;
+        }
+        var id = HttpContext.Session.GetString("UserId");
+        if (Guid.TryParse(id, out var guid)) return guid;
+        return null;
+    }
 }

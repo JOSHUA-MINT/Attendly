@@ -1,5 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using Supabase.Postgrest.Attributes;
 using Supabase.Postgrest.Models;
 
@@ -13,14 +15,23 @@ public class Report : BaseModel
 
     [Column("reporter_id")]
     public Guid ReporterId { get; set; }
+
+    [Newtonsoft.Json.JsonIgnore]
+    [System.Text.Json.Serialization.JsonIgnore]
     public StudentProfile? Reporter { get; set; }
 
     [Column("reported_user_id")]
     public Guid ReportedUserId { get; set; }
+
+    [Newtonsoft.Json.JsonIgnore]
+    [System.Text.Json.Serialization.JsonIgnore]
     public StudentProfile? ReportedUser { get; set; }
 
     [Column("message_id")]
     public Guid? MessageId { get; set; }
+
+    [Newtonsoft.Json.JsonIgnore]
+    [System.Text.Json.Serialization.JsonIgnore]
     public Message? Message { get; set; }
 
     [Column("reason")]

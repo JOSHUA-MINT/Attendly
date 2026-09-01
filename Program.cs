@@ -3,6 +3,7 @@ using Attendly.Data;
 using Attendly.Middleware;
 using Attendly.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,7 +11,9 @@ var builder = WebApplication.CreateBuilder(args);
 // ── Configuration ──
 builder.Services.AddControllersWithViews(options =>
 {
- options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+ // Antiforgery is applied selectively via [ValidateAntiForgeryToken] on
+ // specific actions, not globally, because login/register/forgot-password
+ // are public endpoints that must accept POSTs without an existing session.
 });
 
 // ── Authentication (Cookie-based, session-backed) ──
@@ -63,17 +66,29 @@ AppConfig.SupportEmail = builder.Configuration["AppSettings:SupportEmail"] ?? "s
 
 var app = builder.Build();
 
-// ── Middleware Pipeline ──
+  // ── Middleware Pipeline ──
 app.UseStaticFiles();
 app.UseRouting();
 
 app.UseSession();
 
-// ── Custom Middleware: sync User principal from session ──
-app.UseMiddleware<SessionMiddleware>();
+// Ensure the session cookie is always issued. Without this, the session
+// cookie is only sent after the first session write, which can cause the
+// session to appear empty on the request that follows a login redirect.
+app.Use(async (context, next) =>
+{
+ if (context.Session.IsAvailable)
+ {
+ context.Session.SetString("__init", "1");
+ }
+ await next();
+});
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// ── Custom Middleware: sync User principal from session ──
+app.UseMiddleware<SessionMiddleware>();
 
 // ── Routes ──
 app.MapControllerRoute(

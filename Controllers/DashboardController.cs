@@ -10,25 +10,42 @@ namespace Attendly.Controllers;
 [Route("dashboard")]
 public class DashboardController : Controller
 {
- private readonly ISupabaseService _supabase;
- private readonly IAttendanceCalculationService _calc;
- private readonly IPlannerService _planner;
+    private readonly ISupabaseService _supabase;
+    private readonly IAttendanceCalculationService _calc;
+    private readonly IPlannerService _planner;
+    private readonly ILogger<DashboardController> _logger;
 
- public DashboardController(ISupabaseService supabase, IAttendanceCalculationService calc, IPlannerService planner)
- {
- _supabase = supabase;
- _calc = calc;
- _planner = planner;
- }
+    public DashboardController(ISupabaseService supabase, IAttendanceCalculationService calc, IPlannerService planner, ILogger<DashboardController> logger)
+    {
+        _supabase = supabase;
+        _calc = calc;
+        _planner = planner;
+        _logger = logger;
+    }
 
- [HttpGet("")]
- public async Task<IActionResult> Index()
- {
- var userId = GetCurrentUserId();
- if (userId == null) return RedirectToAction("Login", "Account");
+    [HttpGet("")]
+    public async Task<IActionResult> Index()
+    {
+        var sessionUserId = HttpContext.Session.GetString("UserId");
+        var authIsAuth = User.Identity?.IsAuthenticated ?? false;
+        var claimUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
- var profile = await _supabase.GetProfileByIdAsync(userId.Value);
- if (profile == null) return RedirectToAction("Login", "Account");
+        _logger.LogInformation("Dashboard Index: SessionUserId={SessionUserId}, IsAuth={IsAuth}, ClaimUserId={ClaimUserId}",
+            sessionUserId ?? "NULL", authIsAuth, claimUserId ?? "NULL");
+
+        var userId = GetCurrentUserId();
+        if (userId == null)
+        {
+            _logger.LogWarning("Dashboard: GetCurrentUserId returned null, redirecting to Login");
+            return RedirectToAction("Login", "Account");
+        }
+
+        var profile = await _supabase.GetProfileByIdAsync(userId.Value);
+        if (profile == null)
+        {
+            _logger.LogWarning("Dashboard: Profile not found for userId={UserId}, redirecting to Login", userId.Value);
+            return RedirectToAction("Login", "Account");
+        }
 
  // Load all user data
  var subjects = await _supabase.GetUserSubjectsAsync(userId.Value);
@@ -162,10 +179,15 @@ public class DashboardController : Controller
  return View(vm);
  }
 
- private Guid? GetCurrentUserId()
- {
- var id = HttpContext.Session.GetString("UserId");
- if (Guid.TryParse(id, out var guid)) return guid;
- return null;
- }
+    private Guid? GetCurrentUserId()
+    {
+        var claimId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (!string.IsNullOrEmpty(claimId) && Guid.TryParse(claimId, out var claimGuid))
+        {
+            return claimGuid;
+        }
+        var id = HttpContext.Session.GetString("UserId");
+        if (Guid.TryParse(id, out var guid)) return guid;
+        return null;
+    }
 }

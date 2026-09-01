@@ -1,5 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using Supabase.Postgrest.Attributes;
 using Supabase.Postgrest.Models;
 
@@ -13,6 +15,9 @@ public class Subscription : BaseModel
 
     [Column("user_id")]
     public Guid UserId { get; set; }
+
+    [Newtonsoft.Json.JsonIgnore]
+    [System.Text.Json.Serialization.JsonIgnore]
     public StudentProfile? User { get; set; }
 
     [Column("razorpay_order_id")]
