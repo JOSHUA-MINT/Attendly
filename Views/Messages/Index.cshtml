@@ -1,42 +1,134 @@
 @model List<Attendly.ViewModels.ConversationViewModel>
 @{
- ViewData["Title"] = "Messages";
- }
+    ViewData["Title"] = "Messages";
+    var newConnections = ViewBag.NewConnectionsToChat as List<Attendly.ViewModels.ConnectionItemViewModel> ?? new();
+}
 
 <div class="container-fluid px-4 py-4" style="background: #f0f2f5; min-height: 100vh;">
- <div class="row">
- <div class="col-lg-3">
- <div class="card border-0 shadow-sm">
- <div class="card-header bg-white border-0">
- <h5 class="fw-bold mb-0"><i class="fas fa-comments text-primary me-2"></i>Conversations</h5>
- </div>
- <div class="list-group list-group-flush">
- @foreach (var conv in Model)
- {
- <a asp-action="Chat" asp-route-conversationId="@conv.ConversationId" class="list-group-item list-group-item-action @(ViewBag.ActiveConversationId == conv.ConversationId ? "active" : "")">
- <div class="d-flex justify-content-between">
- <div>
- <strong>@conv.OtherUserName</strong>
- <p class="small text-muted mb-0 text-truncate" style="max-width: 200px;">@conv.LastMessage</p>
- </div>
- @if (conv.UnreadCount > 0)
- {
- <span class="badge bg-primary rounded-pill">@conv.UnreadCount</span>
- }
- </div>
- </a>
- }
- </div>
- </div>
- </div>
- <div class="col-lg-9">
- <div class="card border-0 shadow-sm">
- <div class="card-body text-center py-5">
- <i class="fas fa-comments fa-3x text-muted mb-3"></i>
- <h4>Select a conversation</h4>
- <p class="text-muted">Choose a conversation from the left to start messaging.</p>
- </div>
- </div>
- </div>
- </div>
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-0"><i class="fas fa-comments text-primary me-2"></i>Messages</h3>
+            <p class="text-muted mb-0">Chat with connected students and batchmates.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-controller="Connect" asp-action="Index" class="btn btn-outline-primary btn-sm"><i class="fas fa-search me-1"></i>Find Students</a>
+            <a asp-controller="Connect" asp-action="Connections" class="btn btn-outline-secondary btn-sm"><i class="fas fa-user-friends me-1"></i>My Connections</a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Conversations List Sidebar -->
+        <div class="col-lg-4 col-xl-3">
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold mb-0"><i class="fas fa-inbox text-primary me-2"></i>Conversations</h6>
+                    <span class="badge bg-light text-muted">@Model.Count</span>
+                </div>
+                <div class="list-group list-group-flush" style="max-height: 600px; overflow-y: auto;">
+                    @if (!Model.Any())
+                    {
+                        <div class="p-4 text-center text-muted">
+                            <i class="fas fa-comment-slash fa-2x mb-2"></i>
+                            <p class="small mb-0">No active conversations yet.</p>
+                        </div>
+                    }
+                    @foreach (var conv in Model)
+                    {
+                        <a asp-action="Chat" asp-route-conversationId="@conv.ConversationId" class="list-group-item list-group-item-action p-3">
+                            <div class="d-flex align-items-center">
+                                <div class="position-relative me-3 flex-shrink-0">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold"
+                                         style="width: 44px; height: 44px; background: linear-gradient(135deg, #6366f1, #8b5cf6); font-size: 1.1rem;">
+                                        @if (!string.IsNullOrEmpty(conv.OtherUserImage))
+                                        {
+                                            <img src="@conv.OtherUserImage" alt="@conv.OtherUserName" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover;" />
+                                        }
+                                        else
+                                        {
+                                            @(string.IsNullOrEmpty(conv.OtherUserName) ? "S" : conv.OtherUserName.Substring(0, 1).ToUpper())
+                                        }
+                                    </div>
+                                    @if (conv.IsOnline)
+                                    {
+                                        <span class="position-absolute bottom-0 end-0 bg-success border border-white rounded-circle p-1" style="width: 10px; height: 10px;" title="Online"></span>
+                                    }
+                                </div>
+                                <div class="flex-grow-1 min-w-0">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <strong class="text-truncate d-block" style="max-width: 130px;">@conv.OtherUserName</strong>
+                                        @if (conv.LastMessageAt.HasValue)
+                                        {
+                                            <small class="text-muted" style="font-size: 0.7rem;">@conv.LastMessageAt.Value.ToString("MMM dd")</small>
+                                        }
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <p class="small text-muted mb-0 text-truncate" style="max-width: 140px;">@conv.LastMessage</p>
+                                        @if (conv.UnreadCount > 0)
+                                        {
+                                            <span class="badge bg-primary rounded-pill">@conv.UnreadCount</span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    }
+                </div>
+            </div>
+
+            <!-- Start Chat with New Connections -->
+            @if (newConnections.Any())
+            {
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 py-2">
+                        <small class="fw-bold text-muted text-uppercase">Start a new chat</small>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        @foreach (var c in newConnections)
+                        {
+                            <div class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle me-2 d-flex align-items-center justify-content-center text-white fw-bold"
+                                         style="width: 32px; height: 32px; background: #6366f1; font-size: 0.85rem;">
+                                        @(string.IsNullOrEmpty(c.OtherUserName) ? "S" : c.OtherUserName.Substring(0, 1).ToUpper())
+                                    </div>
+                                    <span class="small fw-medium text-truncate" style="max-width: 110px;">@c.OtherUserName</span>
+                                </div>
+                                <a asp-action="StartChat" asp-route-userId="@c.OtherUserId" class="btn btn-xs btn-outline-primary py-0 px-2">
+                                    <i class="fas fa-comment me-1"></i>Chat
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Main Chat Area (Empty State) -->
+        <div class="col-lg-8 col-xl-9">
+            <div class="card border-0 shadow-sm h-100" style="min-height: 500px;">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center text-center p-5">
+                    <div class="rounded-circle bg-primary bg-opacity-10 p-4 mb-3">
+                        <i class="fas fa-comments fa-3x text-primary"></i>
+                    </div>
+                    <h4 class="fw-bold">Select a conversation to start chatting</h4>
+                    <p class="text-muted" style="max-width: 400px;">
+                        Connect with classmates to share attendance notes, coordinate train journeys, and stay updated.
+                    </p>
+                    @if (Model.Any())
+                    {
+                        <a asp-action="Chat" asp-route-conversationId="@Model.First().ConversationId" class="btn btn-primary px-4">
+                            Open Recent Chat with @Model.First().OtherUserName
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Connect" asp-action="Index" class="btn btn-primary px-4">
+                            <i class="fas fa-user-plus me-1"></i>Connect with Students
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

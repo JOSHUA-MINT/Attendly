@@ -53,6 +53,7 @@ public interface ISupabaseService
 
  Task<Conversation> CreateConversationAsync(Guid user1Id, Guid user2Id);
  Task<Conversation?> GetConversationAsync(Guid user1Id, Guid user2Id);
+ Task<Conversation?> GetConversationByIdAsync(Guid conversationId);
  Task<List<Conversation>> GetUserConversationsAsync(Guid userId);
 
  Task<Message> CreateMessageAsync(Message message);

@@ -1,108 +1,201 @@
 @model List<Attendly.ViewModels.StudentDirectoryViewModel>
 @{
- ViewData["Title"] = (ViewBag.LineLabel ?? "Western Line") + " - Connect";
- var line = ViewBag.RailwayLine ?? "western";
- }
+    ViewData["Title"] = (ViewBag.LineLabel ?? "Western Line") + " - Connect";
+    var line = (string)(ViewBag.RailwayLine ?? "western");
+}
 
 <div class="container-fluid px-4 py-4" style="background: #f0f2f5; min-height: 100vh;">
- <div class="d-flex justify-content-between align-items-center mb-4">
- <div>
- <h3 class="fw-bold"><i class="fas fa-train text-primary me-2"></i>@ViewBag.LineLabel</h3>
- <p class="text-muted mb-0">Connect with students traveling the same line as you.</p>
- </div>
- <div class="btn-group">
- <a asp-action="Index" asp-route-line="western" class="btn btn-outline-primary @(line == "western" ? "active" : "")">Western Line</a>
- <a asp-action="Index" asp-route-line="central" class="btn btn-outline-primary @(line == "central" ? "active" : "")">Central Line</a>
- </div>
- </div>
+    <!-- Flash Messages -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
+            <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["Info"] != null)
+    {
+        <div class="alert alert-info alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
+            <i class="fas fa-info-circle me-2"></i>@TempData["Info"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
- <div class="card border-0 shadow-sm mb-4">
- <div class="card-body">
- <form method="get" asp-action="Index" class="row g-3">
- <input type="hidden" name="line" value="@line" />
- <div class="col-md-3">
- <input name="search" class="form-control" placeholder="Search students..." value="@ViewBag.SearchQuery" />
- </div>
- <div class="col-md-2">
- <select name="college" class="form-select">
- <option value="">All Colleges</option>
- @foreach (var c in ViewBag.Colleges as List<string> ?? new())
- {
- <option value="@c" selected="@(c == ViewBag.FilterCollege)">@c</option>
- }
- </select>
- </div>
- <div class="col-md-2">
- <select name="course" class="form-select">
- <option value="">All Courses</option>
- @foreach (var c in ViewBag.Courses as List<string> ?? new())
- {
- <option value="@c" selected="@(c == ViewBag.FilterCourse)">@c</option>
- }
- </select>
- </div>
- <div class="col-md-2">
- <select name="station" class="form-select">
- <option value="">All Stations</option>
- @foreach (var s in ViewBag.Stations as List<string> ?? new())
- {
- <option value="@s" selected="@(s == ViewBag.FilterStation)">@s</option>
- }
- </select>
- </div>
- <div class="col-md-2">
- <button type="submit" class="btn btn-primary w-100">Filter</button>
- </div>
- </form>
- </div>
- </div>
+    <!-- Header & Navigation -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+        <div>
+            <h3 class="fw-bold mb-0"><i class="fas fa-train text-primary me-2"></i>@ViewBag.LineLabel Students</h3>
+            <p class="text-muted mb-0">Discover and connect with students traveling on the same railway route as you.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <div class="btn-group">
+                <a asp-action="Index" asp-route-line="western" class="btn btn-sm @(string.Equals(line, "western", StringComparison.OrdinalIgnoreCase) ? "btn-primary" : "btn-outline-primary")">
+                    <i class="fas fa-subway me-1"></i>Western Line
+                </a>
+                <a asp-action="Index" asp-route-line="central" class="btn btn-sm @(string.Equals(line, "central", StringComparison.OrdinalIgnoreCase) ? "btn-primary" : "btn-outline-primary")">
+                    <i class="fas fa-train me-1"></i>Central Line
+                </a>
+            </div>
+            <a asp-action="Connections" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-user-friends me-1"></i>My Connections
+            </a>
+            <a asp-controller="Messages" asp-action="Index" class="btn btn-sm btn-outline-info">
+                <i class="fas fa-comments me-1"></i>Messages
+            </a>
+        </div>
+    </div>
 
- <div class="row g-4">
- @foreach (var student in Model)
- {
- <div class="col-md-6 col-xl-4">
- <div class="card border-0 shadow-sm h-100">
- <div class="card-body text-center">
- <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; background: linear-gradient(135deg, #6366f1, #8b5cf6); font-size: 2rem; color: white;">
- @if (!string.IsNullOrEmpty(student.ProfileImageUrl))
- {
- <img src="@student.ProfileImageUrl" alt="" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;" />
- }
- else
- {
- @student.FullName.Substring(0, 1).ToUpper()
- }
- </div>
- <h5 class="fw-bold">@student.FullName</h5>
- <p class="text-muted small mb-2">@student.Course · @student.Year</p>
- <p class="text-muted small mb-2"><i class="fas fa-map-marker-alt me-1"></i>@student.Station</p>
- <p class="text-muted small">@student.College</p>
- @if (student.ConnectionStatus == "none")
- {
- <form asp-action="SendRequest" asp-route-id="@student.Id" method="post" class="mt-3">
- <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-user-plus me-1"></i>Connect</button>
- </form>
- }
- else if (student.ConnectionStatus == "pending")
- {
- <span class="badge bg-warning mt-3"><i class="fas fa-clock me-1"></i>Pending</span>
- }
- else
- {
- <span class="badge bg-success mt-3"><i class="fas fa-check me-1"></i>Connected</span>
- }
- </div>
- </div>
- </div>
- }
- </div>
+    <!-- Search & Filters -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body py-3">
+            <form method="get" asp-action="Index" class="row g-2 align-items-center">
+                <input type="hidden" name="line" value="@line" />
+                <div class="col-md-3">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                        <input name="search" class="form-control border-start-0" placeholder="Search by name..." value="@ViewBag.SearchQuery" />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select name="college" class="form-select form-select-sm">
+                        <option value="">All Colleges</option>
+                        @foreach (var c in ViewBag.Colleges as List<string> ?? new())
+                        {
+                            <option value="@c" selected="@(string.Equals(c, (string)ViewBag.FilterCollege, StringComparison.OrdinalIgnoreCase))">@c</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="course" class="form-select form-select-sm">
+                        <option value="">All Courses</option>
+                        @foreach (var c in ViewBag.Courses as List<string> ?? new())
+                        {
+                            <option value="@c" selected="@(string.Equals(c, (string)ViewBag.FilterCourse, StringComparison.OrdinalIgnoreCase))">@c</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="station" class="form-select form-select-sm">
+                        <option value="">All Stations</option>
+                        @foreach (var s in ViewBag.Stations as List<string> ?? new())
+                        {
+                            <option value="@s" selected="@(string.Equals(s, (string)ViewBag.FilterStation, StringComparison.OrdinalIgnoreCase))">@s</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex gap-1">
+                    <button type="submit" class="btn btn-sm btn-primary flex-grow-1">Filter</button>
+                    <a asp-action="Index" asp-route-line="@line" class="btn btn-sm btn-light" title="Reset Filters"><i class="fas fa-redo"></i></a>
+                </div>
+            </form>
+        </div>
+    </div>
 
- @if (!Model.Any())
- {
- <div class="text-center py-5">
- <i class="fas fa-users fa-3x text-muted mb-3"></i>
- <h4>No students found</h4>
- <p class="text-muted">Try adjusting your filters or search.</p>
- </div>
- }
+    <!-- Student Cards Grid -->
+    <div class="row g-4">
+        @foreach (var student in Model)
+        {
+            <div class="col-md-6 col-lg-4 col-xl-3">
+                <div class="card border-0 shadow-sm h-100 student-card">
+                    <div class="card-body text-center p-4 d-flex flex-column justify-content-between">
+                        <div>
+                            <!-- Avatar -->
+                            <div class="position-relative d-inline-block mb-3">
+                                <div class="rounded-circle mx-auto d-flex align-items-center justify-content-center text-white fw-bold shadow-sm"
+                                     style="width: 72px; height: 72px; background: linear-gradient(135deg, #6366f1, #8b5cf6); font-size: 1.6rem;">
+                                    @if (!string.IsNullOrEmpty(student.ProfileImageUrl))
+                                    {
+                                        <img src="@student.ProfileImageUrl" alt="@student.FullName" style="width: 72px; height: 72px; border-radius: 50%; object-fit: cover;" />
+                                    }
+                                    else
+                                    {
+                                        @(string.IsNullOrEmpty(student.FullName) ? "S" : student.FullName.Substring(0, 1).ToUpper())
+                                    }
+                                </div>
+                                @if (student.IsOnline)
+                                {
+                                    <span class="position-absolute bottom-0 end-0 bg-success border border-white rounded-circle p-1" style="width: 14px; height: 14px;" title="Online"></span>
+                                }
+                            </div>
+
+                            <h5 class="fw-bold mb-1">@student.FullName</h5>
+                            <p class="text-muted small mb-2">
+                                @(string.IsNullOrEmpty(student.Course) ? "Student" : student.Course)
+                                @(string.IsNullOrEmpty(student.Year) ? "" : $"· {student.Year}")
+                            </p>
+
+                            <div class="d-flex flex-wrap justify-content-center gap-1 mb-2">
+                                @if (!string.IsNullOrEmpty(student.College))
+                                {
+                                    <span class="badge bg-light text-dark border small"><i class="fas fa-university text-primary me-1"></i>@student.College</span>
+                                }
+                                @if (!string.IsNullOrEmpty(student.Station))
+                                {
+                                    <span class="badge bg-light text-dark border small"><i class="fas fa-map-marker-alt text-danger me-1"></i>@student.Station</span>
+                                }
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(student.Bio))
+                            {
+                                <p class="text-muted small mb-0 fst-italic">"@student.Bio"</p>
+                            }
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="mt-3 pt-2 border-top">
+                            @if (student.ConnectionStatus == "none")
+                            {
+                                <form asp-action="SendRequest" asp-route-id="@student.Id" method="post">
+                                    <button type="submit" class="btn btn-sm btn-primary w-100">
+                                        <i class="fas fa-user-plus me-1"></i>Connect
+                                    </button>
+                                </form>
+                            }
+                            else if (student.ConnectionStatus == "pending_outgoing")
+                            {
+                                <span class="badge bg-warning bg-opacity-10 text-warning px-3 py-2 w-100 d-block">
+                                    <i class="fas fa-clock me-1"></i>Request Sent
+                                </span>
+                            }
+                            else if (student.ConnectionStatus == "pending_incoming")
+                            {
+                                <div class="d-flex gap-1">
+                                    <form asp-action="Respond" asp-route-id="@student.Id" method="post" class="flex-grow-1">
+                                        <input type="hidden" name="response" value="accept" />
+                                        <button type="submit" class="btn btn-sm btn-success w-100">
+                                            <i class="fas fa-check me-1"></i>Accept
+                                        </button>
+                                    </form>
+                                    <form asp-action="Respond" asp-route-id="@student.Id" method="post" class="flex-grow-1">
+                                        <input type="hidden" name="response" value="reject" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger w-100">
+                                            <i class="fas fa-times me-1"></i>Decline
+                                        </button>
+                                    </form>
+                                </div>
+                            }
+                            else if (student.ConnectionStatus == "accepted")
+                            {
+                                <a asp-controller="Messages" asp-action="StartChat" asp-route-userId="@student.Id" class="btn btn-sm btn-success w-100">
+                                    <i class="fas fa-comment-dots me-1"></i>Message
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="card border-0 shadow-sm text-center py-5 mt-3">
+            <div class="card-body">
+                <i class="fas fa-user-friends fa-3x text-muted mb-3"></i>
+                <h4>No students found</h4>
+                <p class="text-muted">No students matching your search criteria on the @ViewBag.LineLabel. Try adjusting your filters!</p>
+                <a asp-action="Index" asp-route-line="@line" class="btn btn-sm btn-outline-primary"><i class="fas fa-sync-alt me-1"></i>Reset Filters</a>
+            </div>
+        </div>
+    }
 </div>

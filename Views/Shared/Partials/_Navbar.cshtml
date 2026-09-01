@@ -69,6 +69,11 @@
  <i class="fas fa-user-circle me-1"></i>@(Context.Session.GetString("UserName") ?? "Account")
  </a>
  <ul class="dropdown-menu dropdown-menu-dark">
+ @if (string.Equals(Context.Session.GetString("UserRole"), "admin", StringComparison.OrdinalIgnoreCase) || User.IsInRole("admin"))
+ {
+     <li><a class="dropdown-item text-danger fw-bold" asp-controller="Admin" asp-action="Index"><i class="fas fa-shield-alt me-2"></i>Admin Panel</a></li>
+     <li><hr class="dropdown-divider" /></li>
+ }
  <li><a class="dropdown-item" asp-controller="Profile" asp-action="Index"><i class="fas fa-user me-2"></i>Profile</a></li>
  <li><a class="dropdown-item" asp-controller="Premium" asp-action="Index"><i class="fas fa-crown me-2"></i>Premium</a></li>
  <li><hr class="dropdown-divider" /></li>

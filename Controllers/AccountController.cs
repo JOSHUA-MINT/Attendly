@@ -152,14 +152,15 @@ public class AccountController : Controller
  HttpContext.Session.SetString("UserRole", profile.Role ?? "student");
  HttpContext.Session.SetString("IsPremium", profile.IsPremium.ToString());
 
- var claims = new[]
- {
- new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.NameIdentifier, profile.Id.ToString()),
- new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, profile.FullName ?? "Student"),
- new System.Security.Claims.Claim("UserEmail", profile.Email),
- new System.Security.Claims.Claim("UserRole", profile.Role ?? "student"),
- new System.Security.Claims.Claim("IsPremium", profile.IsPremium.ToString())
- };
+        var claims = new[]
+        {
+            new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.NameIdentifier, profile.Id.ToString()),
+            new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, profile.FullName ?? "Student"),
+            new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Role, profile.Role ?? "student"),
+            new System.Security.Claims.Claim("UserEmail", profile.Email),
+            new System.Security.Claims.Claim("UserRole", profile.Role ?? "student"),
+            new System.Security.Claims.Claim("IsPremium", profile.IsPremium.ToString())
+        };
 
  var identity = new System.Security.Claims.ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
  var principal = new System.Security.Claims.ClaimsPrincipal(identity);

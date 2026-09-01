@@ -9,135 +9,154 @@ namespace Attendly.Controllers;
 [Route("messages")]
 public class MessagesController : Controller
 {
- private readonly ISupabaseService _supabase;
+    private readonly ISupabaseService _supabase;
 
- public MessagesController(ISupabaseService supabase)
- {
- _supabase = supabase;
- }
+    public MessagesController(ISupabaseService supabase)
+    {
+        _supabase = supabase;
+    }
 
- [HttpGet("")]
- public async Task<IActionResult> Index()
- {
- var userId = GetCurrentUserId();
- if (userId == null) return RedirectToAction("Login", "Account");
+    [HttpGet("")]
+    public async Task<IActionResult> Index()
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null) return RedirectToAction("Login", "Account");
 
- var conversations = await _supabase.GetUserConversationsAsync(userId.Value);
- var connections = await _supabase.GetUserConnectionsAsync(userId.Value);
- var acceptedConnections = connections.Where(c => c.Status == "accepted").ToList();
+        var conversations = await _supabase.GetUserConversationsAsync(userId.Value);
+        var connections = await _supabase.GetUserConnectionsAsync(userId.Value);
+        var acceptedConnections = connections.Where(c => c.Status == "accepted").ToList();
 
- var viewModels = new List<ConversationViewModel>();
+        var viewModels = new List<ConversationViewModel>();
+        var existingOtherUserIds = new HashSet<Guid>();
 
- foreach (var conv in conversations)
- {
- var otherId = conv.User1Id == userId ? conv.User2Id : conv.User1Id;
- var otherUser = await _supabase.GetProfileByIdAsync(otherId);
- var messages = await _supabase.GetMessagesAsync(conv.Id);
- var unread = messages.Count(m => m.ReadAt == null && m.SenderId != userId);
+        foreach (var conv in conversations)
+        {
+            var otherId = conv.User1Id == userId.Value ? conv.User2Id : conv.User1Id;
+            existingOtherUserIds.Add(otherId);
+            var otherUser = await _supabase.GetProfileByIdAsync(otherId);
+            var messages = await _supabase.GetMessagesAsync(conv.Id);
+            var unread = messages.Count(m => m.ReadAt == null && m.SenderId != userId.Value);
 
- viewModels.Add(new ConversationViewModel
- {
- ConversationId = conv.Id,
- OtherUserId = otherId,
- OtherUserName = otherUser?.FullName ?? "User",
- OtherUserImage = otherUser?.ProfileImageUrl,
- LastMessage = messages.LastOrDefault()?.Content,
- LastMessageAt = messages.LastOrDefault()?.CreatedAt,
- IsOnline = otherUser?.IsOnline ?? false,
- UnreadCount = unread
- });
- }
+            viewModels.Add(new ConversationViewModel
+            {
+                ConversationId = conv.Id,
+                OtherUserId = otherId,
+                OtherUserName = otherUser?.FullName ?? "Student",
+                OtherUserImage = otherUser?.ProfileImageUrl,
+                LastMessage = messages.LastOrDefault()?.Content ?? "No messages yet",
+                LastMessageAt = messages.LastOrDefault()?.CreatedAt ?? conv.CreatedAt,
+                IsOnline = otherUser?.IsOnline ?? false,
+                UnreadCount = unread
+            });
+        }
 
- viewModels = viewModels.OrderByDescending(v => v.LastMessageAt).ToList();
- ViewBag.AcceptedConnections = acceptedConnections;
- return View(viewModels);
- }
+        viewModels = viewModels.OrderByDescending(v => v.LastMessageAt).ToList();
 
- [HttpGet("{conversationId}")]
- public async Task<IActionResult> Chat(Guid conversationId)
- {
- var userId = GetCurrentUserId();
- if (userId == null) return RedirectToAction("Login", "Account");
+        // Build list of accepted connections without active conversations for quick start
+        var newConnectionsToChat = new List<ConnectionItemViewModel>();
+        foreach (var conn in acceptedConnections)
+        {
+            var otherId = conn.RequesterId == userId.Value ? conn.ReceiverId : conn.RequesterId;
+            if (!existingOtherUserIds.Contains(otherId))
+            {
+                var otherUser = await _supabase.GetProfileByIdAsync(otherId);
+                newConnectionsToChat.Add(new ConnectionItemViewModel
+                {
+                    ConnectionId = conn.Id,
+                    OtherUserId = otherId,
+                    OtherUserName = otherUser?.FullName ?? "Student",
+                    OtherUserImage = otherUser?.ProfileImageUrl,
+                    College = otherUser?.College,
+                    Course = otherUser?.Course,
+                    Station = otherUser?.Station,
+                    IsOnline = otherUser?.IsOnline ?? false
+                });
+            }
+        }
 
- var conversations = await _supabase.GetUserConversationsAsync(userId.Value);
- var conv = conversations.FirstOrDefault(c => c.Id == conversationId);
- if (conv == null) return NotFound();
+        ViewBag.NewConnectionsToChat = newConnectionsToChat;
+        return View(viewModels);
+    }
 
- var otherId = conv.User1Id == userId ? conv.User2Id : conv.User1Id;
- var otherUser = await _supabase.GetProfileByIdAsync(otherId);
+    [HttpGet("{conversationId}")]
+    public async Task<IActionResult> Chat(Guid conversationId)
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null) return RedirectToAction("Login", "Account");
 
- var messages = await _supabase.GetMessagesAsync(conversationId);
+        var conv = await _supabase.GetConversationByIdAsync(conversationId);
+        if (conv == null || (conv.User1Id != userId.Value && conv.User2Id != userId.Value))
+        {
+            return RedirectToAction("Index");
+        }
 
- await _supabase.MarkMessagesAsReadAsync(conversationId, userId.Value);
+        var otherId = conv.User1Id == userId.Value ? conv.User2Id : conv.User1Id;
+        var otherUser = await _supabase.GetProfileByIdAsync(otherId);
 
- var vm = new ChatViewModel
- {
- ConversationId = conversationId,
- OtherUserId = otherId,
- OtherUserName = otherUser?.FullName ?? "User",
- OtherUserImage = otherUser?.ProfileImageUrl,
- IsOnline = otherUser?.IsOnline ?? false,
- Messages = messages.Select(m => new ChatMessageViewModel
- {
- Id = m.Id,
- SenderId = m.SenderId,
- Content = m.Content,
- CreatedAt = m.CreatedAt,
- IsMine = m.SenderId == userId,
- IsRead = m.ReadAt != null
- }).ToList()
- };
+        var messages = await _supabase.GetMessagesAsync(conversationId);
 
- return View(vm);
- }
+        // Mark messages as read
+        await _supabase.MarkMessagesAsReadAsync(conversationId, userId.Value);
 
- [HttpPost("{conversationId}/send")]
- [ValidateAntiForgeryToken]
- public async Task<IActionResult> Send(Guid conversationId, string message)
- {
- var userId = GetCurrentUserId();
- if (userId == null) return RedirectToAction("Login", "Account");
+        var vm = new ChatViewModel
+        {
+            ConversationId = conversationId,
+            OtherUserId = otherId,
+            OtherUserName = otherUser?.FullName ?? "Student",
+            OtherUserImage = otherUser?.ProfileImageUrl,
+            IsOnline = otherUser?.IsOnline ?? false,
+            Messages = messages.Select(m => new ChatMessageViewModel
+            {
+                Id = m.Id,
+                SenderId = m.SenderId,
+                Content = m.Content,
+                CreatedAt = m.CreatedAt,
+                IsMine = m.SenderId == userId.Value,
+                IsRead = m.ReadAt != null
+            }).ToList()
+        };
 
- if (string.IsNullOrWhiteSpace(message))
- return RedirectToAction("Chat", new { conversationId });
+        return View(vm);
+    }
 
- var msg = new Message
- {
- ConversationId = conversationId,
- SenderId = userId.Value,
- Content = message.Trim(),
- CreatedAt = DateTime.UtcNow
- };
+    [HttpPost("{conversationId}/send")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Send(Guid conversationId, string message)
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null) return RedirectToAction("Login", "Account");
 
- await _supabase.CreateMessageAsync(msg);
+        if (string.IsNullOrWhiteSpace(message))
+            return RedirectToAction("Chat", new { conversationId });
 
- // Update other user's last_seen
- var conversations = await _supabase.GetUserConversationsAsync(userId.Value);
- var conv = conversations.FirstOrDefault(c => c.Id == conversationId);
- if (conv != null)
- {
- var otherId = conv.User1Id == userId.Value ? conv.User2Id : conv.User1Id;
- await _supabase.UpdateProfileAsync(new StudentProfile { Id = otherId, LastSeen = DateTime.UtcNow });
- }
+        var msg = new Message
+        {
+            ConversationId = conversationId,
+            SenderId = userId.Value,
+            Content = message.Trim(),
+            CreatedAt = DateTime.UtcNow
+        };
 
- return RedirectToAction("Chat", new { conversationId });
- }
+        await _supabase.CreateMessageAsync(msg);
 
- [HttpPost("start-chat/{userId}")]
- [ValidateAntiForgeryToken]
- public async Task<IActionResult> StartChat(Guid userId)
- {
- var currentUserId = GetCurrentUserId();
- if (currentUserId == null) return RedirectToAction("Login", "Account");
+        return RedirectToAction("Chat", new { conversationId });
+    }
 
- var conv = await _supabase.GetConversationAsync(currentUserId.Value, userId);
- if (conv == null)
- {
- conv = await _supabase.CreateConversationAsync(currentUserId.Value, userId);
- }
+    [HttpGet("start-chat/{userId}")]
+    [HttpPost("start-chat/{userId}")]
+    public async Task<IActionResult> StartChat(Guid userId)
+    {
+        var currentUserId = GetCurrentUserId();
+        if (currentUserId == null) return RedirectToAction("Login", "Account");
 
- return RedirectToAction("Chat", new { conversationId = conv.Id });
- }
+        var conv = await _supabase.GetConversationAsync(currentUserId.Value, userId);
+        if (conv == null)
+        {
+            conv = await _supabase.CreateConversationAsync(currentUserId.Value, userId);
+        }
+
+        return RedirectToAction("Chat", new { conversationId = conv.Id });
+    }
 
     private Guid? GetCurrentUserId()
     {

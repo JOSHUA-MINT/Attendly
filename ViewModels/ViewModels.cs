@@ -275,16 +275,42 @@ public class ConnectViewModel
 
 public class StudentDirectoryViewModel
 {
- public Guid Id { get; set; }
- public string FullName { get; set; } = string.Empty;
- public string? ProfileImageUrl { get; set; }
- public string? College { get; set; }
- public string? Course { get; set; }
- public string? Year { get; set; }
- public string? Station { get; set; }
- public bool IsOnline { get; set; }
- public string? Bio { get; set; }
- public string ConnectionStatus { get; set; } = "none"; // none, pending, accepted
+    public Guid Id { get; set; }
+    public string FullName { get; set; } = string.Empty;
+    public string? ProfileImageUrl { get; set; }
+    public string? College { get; set; }
+    public string? Course { get; set; }
+    public string? Year { get; set; }
+    public string? Station { get; set; }
+    public string? RailwayLine { get; set; }
+    public bool IsOnline { get; set; }
+    public string? Bio { get; set; }
+    public string ConnectionStatus { get; set; } = "none"; // none, pending_outgoing, pending_incoming, accepted
+}
+
+public class ConnectionItemViewModel
+{
+    public Guid ConnectionId { get; set; }
+    public Guid OtherUserId { get; set; }
+    public string OtherUserName { get; set; } = string.Empty;
+    public string? OtherUserImage { get; set; }
+    public string? College { get; set; }
+    public string? Course { get; set; }
+    public string? Year { get; set; }
+    public string? Station { get; set; }
+    public string? RailwayLine { get; set; }
+    public string? Bio { get; set; }
+    public bool IsOnline { get; set; }
+    public string Status { get; set; } = "pending";
+    public bool IsIncoming { get; set; }
+    public DateTime CreatedAt { get; set; }
+}
+
+public class ConnectionsPageViewModel
+{
+    public List<ConnectionItemViewModel> Accepted { get; set; } = new();
+    public List<ConnectionItemViewModel> PendingIncoming { get; set; } = new();
+    public List<ConnectionItemViewModel> PendingOutgoing { get; set; } = new();
 }
 
 // ── Messages ──

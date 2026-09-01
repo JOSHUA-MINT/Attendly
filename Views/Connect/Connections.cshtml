@@ -1,80 +1,195 @@
-@model List<Attendly.Models.Connection>
+@model Attendly.ViewModels.ConnectionsPageViewModel
 @{
     ViewData["Title"] = "My Connections";
-    var sessionUserIdStr = Context.Session.GetString("UserId");
-    Guid.TryParse(sessionUserIdStr, out var currentUserId);
 }
 
 <div class="container-fluid px-4 py-4" style="background: #f0f2f5; min-height: 100vh;">
- <h3 class="fw-bold mb-4"><i class="fas fa-user-friends text-primary me-2"></i>My Connections</h3>
+    <!-- Flash Messages -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
+            <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["Info"] != null)
+    {
+        <div class="alert alert-info alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
+            <i class="fas fa-info-circle me-2"></i>@TempData["Info"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
- @if (ViewBag.Pending != null && ((List<Attendly.Models.Connection>)ViewBag.Pending).Any())
- {
- <div class="card border-0 shadow-sm mb-4">
- <div class="card-header bg-warning bg-opacity-10 border-0">
- <h5 class="fw-bold mb-0"><i class="fas fa-user-clock text-warning me-2"></i>Pending Requests (@(((List<Attendly.Models.Connection>)ViewBag.Pending).Count))</h5>
- </div>
- <div class="card-body">
- @foreach (var req in (List<Attendly.Models.Connection>)ViewBag.Pending)
- {
-  var otherUser = req.RequesterId == currentUserId ? req.Receiver : req.Requester;
- <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
- <div>
- <strong>@(req.Requester?.FullName ?? req.Receiver?.FullName ?? "User")</strong>
- <p class="text-muted small mb-0">Wants to connect with you</p>
- </div>
- <div class="d-flex gap-2">
- <form asp-action="Respond" asp-route-id="@req.RequesterId" method="post">
- <input type="hidden" name="response" value="accept" />
- <button type="submit" class="btn btn-sm btn-success">Accept</button>
- </form>
- <form asp-action="Respond" asp-route-id="@req.RequesterId" method="post">
- <input type="hidden" name="response" value="reject" />
- <button type="submit" class="btn btn-sm btn-outline-danger">Decline</button>
- </form>
- </div>
- </div>
- }
- </div>
- </div>
- }
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-0"><i class="fas fa-user-friends text-primary me-2"></i>My Connections</h3>
+            <p class="text-muted mb-0">Manage your student network and connection requests.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="Index" class="btn btn-primary btn-sm"><i class="fas fa-search me-1"></i>Find Students</a>
+            <a asp-controller="Messages" asp-action="Index" class="btn btn-outline-info btn-sm"><i class="fas fa-comments me-1"></i>Messages</a>
+        </div>
+    </div>
 
- <div class="card border-0 shadow-sm">
- <div class="card-header bg-white border-0 py-3">
- <h5 class="fw-bold mb-0">Accepted Connections (@Model.Count)</h5>
- </div>
- <div class="card-body">
- @if (Model.Any())
- {
- <div class="row g-3">
- @foreach (var conn in Model)
- {
-  var otherUser = conn.RequesterId == currentUserId ? conn.Receiver : conn.Requester;
- <div class="col-md-6">
- <div class="card border-0 bg-light">
- <div class="card-body d-flex justify-content-between align-items-center">
- <div>
- <strong>@(otherUser?.FullName ?? "User")</strong>
- <p class="text-muted small mb-0">@otherUser?.Course · @otherUser?.Year</p>
- </div>
- <div class="d-flex gap-2">
- <a asp-controller="Messages" asp-action="StartChat" asp-route-userId="@(conn.RequesterId == currentUserId ? conn.ReceiverId : conn.RequesterId)" class="btn btn-sm btn-primary">
- <i class="fas fa-comment"></i>
- </a>
- <form asp-action="RemoveConnection" asp-route-id="@(conn.RequesterId == currentUserId ? conn.ReceiverId : conn.RequesterId)" method="post">
- <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-user-times"></i></button>
- </form>
- </div>
- </div>
- </div>
- </div>
- }
- </div>
- }
- else
- {
- <p class="text-muted text-center py-4">No connections yet. Browse the Connect page to find students!</p>
- }
- </div>
- </div>
+    <!-- Pending Incoming Requests Section -->
+    @if (Model.PendingIncoming.Any())
+    {
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-warning bg-opacity-10 border-0 py-3">
+                <h5 class="fw-bold text-warning-emphasis mb-0">
+                    <i class="fas fa-user-clock me-2"></i>Incoming Requests (@Model.PendingIncoming.Count)
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    @foreach (var req in Model.PendingIncoming)
+                    {
+                        <div class="list-group-item d-flex justify-content-between align-items-center p-3">
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle me-3 d-flex align-items-center justify-content-center text-white fw-bold"
+                                     style="width: 48px; height: 48px; background: linear-gradient(135deg, #f59e0b, #d97706); font-size: 1.2rem;">
+                                    @if (!string.IsNullOrEmpty(req.OtherUserImage))
+                                    {
+                                        <img src="@req.OtherUserImage" alt="@req.OtherUserName" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;" />
+                                    }
+                                    else
+                                    {
+                                        @(string.IsNullOrEmpty(req.OtherUserName) ? "S" : req.OtherUserName.Substring(0, 1).ToUpper())
+                                    }
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-0">@req.OtherUserName</h6>
+                                    <small class="text-muted">
+                                        @(string.IsNullOrEmpty(req.Course) ? "Student" : req.Course)
+                                        @(string.IsNullOrEmpty(req.Year) ? "" : $"· {req.Year}")
+                                        @(string.IsNullOrEmpty(req.College) ? "" : $"· {req.College}")
+                                        @(string.IsNullOrEmpty(req.Station) ? "" : $"· {req.Station}")
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <form asp-action="Respond" asp-route-id="@req.OtherUserId" method="post">
+                                    <input type="hidden" name="response" value="accept" />
+                                    <button type="submit" class="btn btn-sm btn-success px-3">
+                                        <i class="fas fa-check me-1"></i>Accept
+                                    </button>
+                                </form>
+                                <form asp-action="Respond" asp-route-id="@req.OtherUserId" method="post">
+                                    <input type="hidden" name="response" value="reject" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger px-3">
+                                        <i class="fas fa-times me-1"></i>Decline
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Accepted Connections Section -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white border-0 py-3">
+            <h5 class="fw-bold mb-0"><i class="fas fa-users text-success me-2"></i>Connected Students (@Model.Accepted.Count)</h5>
+        </div>
+        <div class="card-body">
+            @if (Model.Accepted.Any())
+            {
+                <div class="row g-3">
+                    @foreach (var conn in Model.Accepted)
+                    {
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card border bg-light h-100">
+                                <div class="card-body d-flex flex-column justify-content-between">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="position-relative me-3">
+                                            <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold"
+                                                 style="width: 52px; height: 52px; background: linear-gradient(135deg, #10b981, #059669); font-size: 1.3rem;">
+                                                @if (!string.IsNullOrEmpty(conn.OtherUserImage))
+                                                {
+                                                    <img src="@conn.OtherUserImage" alt="@conn.OtherUserName" style="width: 52px; height: 52px; border-radius: 50%; object-fit: cover;" />
+                                                }
+                                                else
+                                                {
+                                                    @(string.IsNullOrEmpty(conn.OtherUserName) ? "S" : conn.OtherUserName.Substring(0, 1).ToUpper())
+                                                }
+                                            </div>
+                                            @if (conn.IsOnline)
+                                            {
+                                                <span class="position-absolute bottom-0 end-0 bg-success border border-white rounded-circle p-1" style="width: 12px; height: 12px;" title="Online"></span>
+                                            }
+                                        </div>
+                                        <div>
+                                            <h6 class="fw-bold mb-0">@conn.OtherUserName</h6>
+                                            <small class="text-muted d-block">
+                                                @(string.IsNullOrEmpty(conn.Course) ? "Student" : conn.Course)
+                                                @(string.IsNullOrEmpty(conn.Year) ? "" : $"· {conn.Year}")
+                                            </small>
+                                            @if (!string.IsNullOrEmpty(conn.College) || !string.IsNullOrEmpty(conn.Station))
+                                            {
+                                                <small class="text-muted d-block text-truncate" style="max-width: 200px;">
+                                                    @(conn.College ?? "") @(conn.Station != null ? $"· {conn.Station}" : "")
+                                                </small>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="d-flex gap-2 border-top pt-2">
+                                        <a asp-controller="Messages" asp-action="StartChat" asp-route-userId="@conn.OtherUserId" class="btn btn-sm btn-primary flex-grow-1">
+                                            <i class="fas fa-comment me-1"></i>Message
+                                        </a>
+                                        <form asp-action="RemoveConnection" asp-route-id="@conn.OtherUserId" method="post" onsubmit="return confirm('Remove connection with @conn.OtherUserName?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Remove Connection">
+                                                <i class="fas fa-user-minus"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-4 text-muted">
+                    <i class="fas fa-user-friends fa-2x mb-2"></i>
+                    <p class="mb-2">You don't have any accepted connections yet.</p>
+                    <a asp-action="Index" class="btn btn-sm btn-primary"><i class="fas fa-search me-1"></i>Explore Student Directory</a>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Outgoing Pending Requests -->
+    @if (Model.PendingOutgoing.Any())
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-3">
+                <h6 class="fw-bold text-muted mb-0"><i class="fas fa-paper-plane me-2"></i>Sent Requests Waiting for Approval (@Model.PendingOutgoing.Count)</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    @foreach (var outReq in Model.PendingOutgoing)
+                    {
+                        <div class="list-group-item d-flex justify-content-between align-items-center p-3">
+                            <div>
+                                <strong>@outReq.OtherUserName</strong>
+                                <span class="badge bg-secondary ms-2"><i class="fas fa-clock me-1"></i>Pending</span>
+                                <small class="text-muted d-block">
+                                    @(outReq.Course ?? "") @(outReq.College != null ? $"· {outReq.College}" : "")
+                                </small>
+                            </div>
+                            <form asp-action="RemoveConnection" asp-route-id="@outReq.OtherUserId" method="post">
+                                <button type="submit" class="btn btn-sm btn-outline-secondary" title="Cancel Request">
+                                    <i class="fas fa-times me-1"></i>Cancel
+                                </button>
+                            </form>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
 </div>

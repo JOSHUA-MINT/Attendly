@@ -1,41 +1,112 @@
 @model Attendly.ViewModels.ChatViewModel
 @{
- ViewData["Title"] = "Chat";
- }
+    ViewData["Title"] = "Chat with " + Model.OtherUserName;
+}
 
 <div class="container-fluid px-4 py-4" style="background: #f0f2f5; min-height: 100vh;">
- <div class="row" style="max-width: 900px; margin: 0 auto;">
- <div class="col-12">
- <div class="card border-0 shadow-sm">
- <div class="card-header bg-white border-0 py-3">
- <div class="d-flex align-items-center">
- <div class="rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; font-weight: bold;">
- @Model.OtherUserName.Substring(0, 1).ToUpper()
- </div>
- <div>
- <h6 class="fw-bold mb-0">@Model.OtherUserName</h6>
- <small class="text-muted">@(Model.IsOnline ? "Online" : "Offline")</small>
- </div>
- </div>
- </div>
- <div class="card-body p-0" style="height: 400px; overflow-y: auto;" id="chatMessages">
- @foreach (var msg in Model.Messages)
- {
- <div class="d-flex @(msg.IsMine ? "justify-content-end" : "justify-content-start") px-4 py-2">
- <div class="rounded px-3 py-2 @(msg.IsMine ? "bg-primary text-white" : "bg-light")" style="max-width: 70%;">
- <p class="mb-0 small">@msg.Content</p>
- <small class="@(msg.IsMine ? "text-white-50" : "text-muted")" style="font-size: 0.65rem;">@msg.CreatedAt.ToString("hh:mm tt")</small>
- </div>
- </div>
- }
- </div>
- <div class="card-footer bg-white border-0">
- <form asp-action="Send" asp-route-conversationId="@Model.ConversationId" method="post" class="d-flex gap-2">
- <input type="text" name="message" class="form-control" placeholder="Type a message..." required autofocus />
- <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i></button>
- </form>
- </div>
- </div>
- </div>
- </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
+            <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+                <!-- Chat Header -->
+                <div class="card-header bg-white border-0 py-3 px-4 d-flex justify-content-between align-items-center shadow-sm">
+                    <div class="d-flex align-items-center">
+                        <a asp-action="Index" class="btn btn-sm btn-light rounded-circle me-3" title="Back to Conversations">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                        <div class="position-relative me-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold"
+                                 style="width: 44px; height: 44px; background: linear-gradient(135deg, #6366f1, #8b5cf6); font-size: 1.1rem;">
+                                @if (!string.IsNullOrEmpty(Model.OtherUserImage))
+                                {
+                                    <img src="@Model.OtherUserImage" alt="@Model.OtherUserName" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover;" />
+                                }
+                                else
+                                {
+                                    @(string.IsNullOrEmpty(Model.OtherUserName) ? "S" : Model.OtherUserName.Substring(0, 1).ToUpper())
+                                }
+                            </div>
+                            @if (Model.IsOnline)
+                            {
+                                <span class="position-absolute bottom-0 end-0 bg-success border border-white rounded-circle p-1" style="width: 10px; height: 10px;" title="Online"></span>
+                            }
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0">@Model.OtherUserName</h6>
+                            <small class="text-muted">@(Model.IsOnline ? "Online" : "Active on Attendly")</small>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a asp-controller="Connect" asp-action="Connections" class="btn btn-sm btn-outline-secondary" title="View Connection">
+                            <i class="fas fa-user-friends"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Messages Window -->
+                <div class="card-body p-4" style="height: 480px; overflow-y: auto; background: #fafafa;" id="chatMessages">
+                    @if (!Model.Messages.Any())
+                    {
+                        <div class="text-center py-5 text-muted">
+                            <div class="rounded-circle bg-light d-inline-flex p-3 mb-2">
+                                <i class="fas fa-hand-sparkles fa-2x text-warning"></i>
+                            </div>
+                            <h6>Say hello to @Model.OtherUserName! 👋</h6>
+                            <p class="small mb-0">Start the conversation by sending your first message.</p>
+                        </div>
+                    }
+
+                    @{
+                        DateTime? lastDate = null;
+                    }
+                    @foreach (var msg in Model.Messages)
+                    {
+                        @if (!lastDate.HasValue || lastDate.Value.Date != msg.CreatedAt.Date)
+                        {
+                            <div class="text-center my-3">
+                                <span class="badge bg-white text-muted shadow-sm px-3 py-1 fw-normal" style="font-size: 0.75rem;">
+                                    @msg.CreatedAt.ToString("MMMM dd, yyyy")
+                                </span>
+                            </div>
+                            lastDate = msg.CreatedAt;
+                        }
+
+                        <div class="d-flex @(msg.IsMine ? "justify-content-end" : "justify-content-start") mb-3">
+                            <div class="rounded-3 px-3 py-2 shadow-sm @(msg.IsMine ? "bg-primary text-white" : "bg-white text-dark")"
+                                 style="max-width: 75%; border-radius: @(msg.IsMine ? "16px 16px 4px 16px" : "16px 16px 16px 4px") !important;">
+                                <p class="mb-1" style="font-size: 0.95rem; word-break: break-word; white-space: pre-wrap;">@msg.Content</p>
+                                <div class="d-flex justify-content-end align-items-center gap-1">
+                                    <small class="@(msg.IsMine ? "text-white-50" : "text-muted")" style="font-size: 0.7rem;">
+                                        @msg.CreatedAt.ToString("hh:mm tt")
+                                    </small>
+                                    @if (msg.IsMine)
+                                    {
+                                        <i class="fas fa-check-double text-white-50" style="font-size: 0.65rem;" title="@(msg.IsRead ? "Read" : "Delivered")"></i>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Message Input Footer -->
+                <div class="card-footer bg-white border-0 p-3 shadow-sm">
+                    <form asp-action="Send" asp-route-conversationId="@Model.ConversationId" method="post" class="d-flex gap-2">
+                        <input type="text" name="message" class="form-control rounded-pill px-3" placeholder="Type a message..." required autofocus autocomplete="off" />
+                        <button type="submit" class="btn btn-primary rounded-circle px-3 py-2" title="Send Message">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var chatWindow = document.getElementById("chatMessages");
+        if (chatWindow) {
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+    });
+</script>

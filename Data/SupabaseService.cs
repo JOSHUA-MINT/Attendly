@@ -86,7 +86,7 @@ public class SupabaseService : ISupabaseService, IDisposable, IAsyncDisposable
 
         if (!string.IsNullOrEmpty(line))
         {
-            queryBuilder = queryBuilder.Filter("railway_line", Operator.Equals, line);
+            queryBuilder = queryBuilder.Filter("railway_line", Operator.ILike, $"%{line}%");
         }
 
         if (!string.IsNullOrEmpty(query))
@@ -390,13 +390,17 @@ public class SupabaseService : ISupabaseService, IDisposable, IAsyncDisposable
     // ── Conversations ──
     public async Task<Conversation> CreateConversationAsync(Guid user1Id, Guid user2Id)
     {
-        var minId = user1Id < user2Id ? user1Id : user2Id;
-        var maxId = user1Id < user2Id ? user2Id : user1Id;
+        var existing = await GetConversationAsync(user1Id, user2Id);
+        if (existing != null) return existing;
+
+        var minId = user1Id.CompareTo(user2Id) < 0 ? user1Id : user2Id;
+        var maxId = user1Id.CompareTo(user2Id) < 0 ? user2Id : user1Id;
         var conv = new Conversation
         {
             User1Id = minId,
             User2Id = maxId,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            LastMessageAt = DateTime.UtcNow
         };
 
         var result = await _client.From<Conversation>()
@@ -406,13 +410,32 @@ public class SupabaseService : ISupabaseService, IDisposable, IAsyncDisposable
 
     public async Task<Conversation?> GetConversationAsync(Guid user1Id, Guid user2Id)
     {
-        var minId = user1Id < user2Id ? user1Id : user2Id;
-        var maxId = user1Id < user2Id ? user2Id : user1Id;
+        var minId = user1Id.CompareTo(user2Id) < 0 ? user1Id : user2Id;
+        var maxId = user1Id.CompareTo(user2Id) < 0 ? user2Id : user1Id;
         try
         {
             var result = await _client.From<Conversation>()
                 .Filter("user1_id", Operator.Equals, minId.ToString())
                 .Filter("user2_id", Operator.Equals, maxId.ToString())
+                .Get();
+            var found = result.Models.FirstOrDefault();
+            if (found != null) return found;
+
+            var result2 = await _client.From<Conversation>()
+                .Filter("user1_id", Operator.Equals, maxId.ToString())
+                .Filter("user2_id", Operator.Equals, minId.ToString())
+                .Get();
+            return result2.Models.FirstOrDefault();
+        }
+        catch { return null; }
+    }
+
+    public async Task<Conversation?> GetConversationByIdAsync(Guid conversationId)
+    {
+        try
+        {
+            var result = await _client.From<Conversation>()
+                .Filter("id", Operator.Equals, conversationId.ToString())
                 .Get();
             return result.Models.FirstOrDefault();
         }
@@ -431,7 +454,7 @@ public class SupabaseService : ISupabaseService, IDisposable, IAsyncDisposable
             .Get();
         list.AddRange(result2.Models);
 
-        return list;
+        return list.GroupBy(c => c.Id).Select(g => g.First()).OrderByDescending(c => c.LastMessageAt ?? c.CreatedAt).ToList();
     }
 
     // ── Messages ──
