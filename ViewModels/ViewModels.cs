@@ -50,15 +50,18 @@ public class DashboardViewModel
 
 public class SubjectSummary
 {
- public Guid SubjectId { get; set; }
- public string Name { get; set; } = string.Empty;
- public string? Code { get; set; }
- public double AttendancePercentage { get; set; }
- public int Present { get; set; }
- public int Absent { get; set; }
- public int Total { get; set; }
- public string Status { get; set; } = "SAFE"; // SAFE, WARNING, CRITICAL
- public string? Color { get; set; } = "#3B82F6";
+    public Guid SubjectId { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string? Code { get; set; }
+    public double AttendancePercentage { get; set; }
+    public int Present { get; set; }
+    public int Absent { get; set; }
+    public int Total { get; set; }
+    public int TargetPercentage { get; set; } = 75;
+    public int SafeAbsences { get; set; } = 0;
+    public int ClassesNeeded { get; set; } = 0;
+    public string Status { get; set; } = "SAFE"; // SAFE, WARNING, CRITICAL, NO_DATA
+    public string? Color { get; set; } = "#3B82F6";
 }
 
 public class TodaysSchedule
@@ -135,18 +138,19 @@ public class AttendanceMarkViewModel
 
 public class AttendanceRecordsViewModel
 {
- public Guid SubjectId { get; set; }
- public string SubjectName { get; set; } = string.Empty;
- public double AttendancePercentage { get; set; }
- public int PresentCount { get; set; }
- public int AbsentCount { get; set; }
- public int CancelledCount { get; set; }
- public int LateCount { get; set; }
- public int ExcusedCount { get; set; }
- public int TargetPercentage { get; set; }
- public int ClassesNeededForTarget { get; set; }
- public int SafeAbsences { get; set; }
- public List<AttendanceRecordItem> Records { get; set; } = new();
+    public Guid SubjectId { get; set; }
+    public string SubjectName { get; set; } = string.Empty;
+    public double AttendancePercentage { get; set; }
+    public int PresentCount { get; set; }
+    public int AbsentCount { get; set; }
+    public int CancelledCount { get; set; }
+    public int LateCount { get; set; }
+    public int ExcusedCount { get; set; }
+    public int TargetPercentage { get; set; }
+    public int ClassesNeededForTarget { get; set; }
+    public int SafeAbsences { get; set; }
+    public List<AttendanceRecordItem> Records { get; set; } = new();
+    public List<SubjectSummary> AllSubjects { get; set; } = new();
 }
 
 public class AttendanceRecordItem

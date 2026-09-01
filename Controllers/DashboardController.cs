@@ -65,28 +65,33 @@ public class DashboardController : Controller
  var target = subjects.Any() ? subjects.Max(s => s.TargetPercentage) : 75;
  var overallPct = _calc.CalculateAttendancePercentage(present, conducted);
 
- // ── Subject Summaries ──
- var summaries = subjects.Select(s =>
- {
- var subjRecords = allRecords.Where(r => r.SubjectId == s.Id && r.Status != "cancelled").ToList();
- var sp = subjRecords.Count(r => r.Status == "present" || r.Status == "late" || r.Status == "excused");
- var st = subjRecords.Count;
- var pct = _calc.CalculateAttendancePercentage(sp, st);
- var status = _calc.GetAttendanceStatus(pct, s.TargetPercentage);
+        // ── Subject Summaries ──
+        var summaries = subjects.Select(s =>
+        {
+            var subjRecords = allRecords.Where(r => r.SubjectId == s.Id && r.Status != "cancelled").ToList();
+            var sp = subjRecords.Count(r => r.Status == "present" || r.Status == "late" || r.Status == "excused");
+            var st = subjRecords.Count;
+            var pct = _calc.CalculateAttendancePercentage(sp, st);
+            var status = st == 0 ? "NO_DATA" : _calc.GetAttendanceStatus(pct, s.TargetPercentage);
+            var safe = _calc.CalculateSafeAbsences(sp, st, s.TargetPercentage);
+            var needed = _calc.CalculateClassesNeededForTarget(sp, st, s.TargetPercentage);
 
- return new SubjectSummary
- {
- SubjectId = s.Id,
- Name = s.Name,
- Code = s.Code,
- AttendancePercentage = pct,
- Present = sp,
- Absent = st - sp,
- Total = st,
- Status = status,
- Color = s.Color
- };
- }).OrderByDescending(s => s.AttendancePercentage).ToList();
+            return new SubjectSummary
+            {
+                SubjectId = s.Id,
+                Name = s.Name,
+                Code = s.Code,
+                AttendancePercentage = pct,
+                Present = sp,
+                Absent = st - sp,
+                Total = st,
+                TargetPercentage = s.TargetPercentage,
+                SafeAbsences = safe,
+                ClassesNeeded = needed,
+                Status = status,
+                Color = s.Color
+            };
+        }).OrderByDescending(s => s.AttendancePercentage).ToList();
 
  // ── Today's Schedule ──
  var todayDOW = (int)DateTime.Now.DayOfWeek;

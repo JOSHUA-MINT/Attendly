@@ -1,82 +1,285 @@
 @model Attendly.ViewModels.AttendanceRecordsViewModel
 @{
- ViewData["Title"] = "Attendance Records";
- }
+    ViewData["Title"] = "Attendance Tracker";
+}
 
 <div class="container-fluid px-4 py-4" style="background: #f0f2f5; min-height: 100vh;">
- <div class="row">
- <div class="col-12">
- <h3 class="fw-bold mb-3"><i class="fas fa-clipboard-list text-primary me-2"></i>@Model.SubjectName - Records</h3>
+    <!-- Flash Messages -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
+            <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
- @if (TempData["Success"] != null)
- {
- <div class="alert alert-success">@TempData["Success"]</div>
- }
+    <!-- Page Header & Subject Switcher -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+        <div>
+            <h3 class="fw-bold mb-0"><i class="fas fa-clipboard-check text-primary me-2"></i>Attendance Tracker</h3>
+            <p class="text-muted mb-0">Record and adjust your lecture attendance to track your percentage in real-time.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary btn-sm"><i class="fas fa-arrow-left me-1"></i>Dashboard</a>
+            <a asp-controller="Attendance" asp-action="Simulator" class="btn btn-outline-info btn-sm"><i class="fas fa-calculator me-1"></i>Skip Simulator</a>
+            <a asp-controller="Subjects" asp-action="Create" class="btn btn-success btn-sm"><i class="fas fa-plus me-1"></i>Add Subject</a>
+        </div>
+    </div>
 
- <div class="row g-3 mb-4">
- <div class="col-md-3">
- <div class="card border-0 shadow-sm">
- <div class="card-body text-center">
- <h2 class="fw-bold text-primary">@Model.AttendancePercentage.ToString("F1")%</h2>
- <p class="text-muted mb-0">Attendance</p>
- </div>
- </div>
- </div>
- <div class="col-md-3">
- <div class="card border-0 shadow-sm">
- <div class="card-body text-center">
- <h2 class="fw-bold text-success">@Model.PresentCount</h2>
- <p class="text-muted mb-0">Present</p>
- </div>
- </div>
- </div>
- <div class="col-md-3">
- <div class="card border-0 shadow-sm">
- <div class="card-body text-center">
- <h2 class="fw-bold text-danger">@Model.AbsentCount</h2>
- <p class="text-muted mb-0">Absent</p>
- </div>
- </div>
- </div>
- <div class="col-md-3">
- <div class="card border-0 shadow-sm">
- <div class="card-body text-center">
- <h2 class="fw-bold text-warning">@Model.SafeAbsences</h2>
- <p class="text-muted mb-0">Safe Absences</p>
- </div>
- </div>
- </div>
- </div>
+    @if (Model.AllSubjects != null && Model.AllSubjects.Any())
+    {
+        <!-- Subject Switcher Pills -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-2">
+                <div class="d-flex gap-2 flex-wrap align-items-center">
+                    <span class="small text-muted fw-bold ms-2 me-1">Subjects:</span>
+                    @foreach (var subj in Model.AllSubjects)
+                    {
+                        var isSelected = subj.SubjectId == Model.SubjectId;
+                        <a asp-action="Index" asp-route-subjectId="@subj.SubjectId" 
+                           class="btn btn-sm @(isSelected ? "btn-primary" : "btn-outline-secondary") rounded-pill px-3 py-1 position-relative">
+                            @subj.Name
+                            <span class="badge @(isSelected ? "bg-light text-primary" : "bg-secondary") ms-1">
+                                @(subj.Total == 0 ? "0%" : $"{subj.AttendancePercentage:F1}%")
+                            </span>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    }
 
- <div class="card border-0 shadow-sm">
- <div class="card-body p-0">
- <div class="table-responsive">
- <table class="table table-hover mb-0">
- <thead class="table-light">
- <tr>
- <th>Date</th>
- <th>Status</th>
- <th>Notes</th>
- </tr>
- </thead>
- <tbody>
- @foreach (var record in Model.Records)
- {
- <tr>
- <td>@record.Date.ToString("MMM dd, yyyy")</td>
- <td>
- <span class="badge bg-@(record.Status == "present" ? "success" : record.Status == "absent" ? "danger" : record.Status == "cancelled" ? "secondary" : "warning")">
- @record.Status.ToUpper()
- </span>
- </td>
- <td>@record.Notes</td>
- </tr>
- }
- </tbody>
- </table>
- </div>
- </div>
- </div>
- </div>
- </div>
+    @if (Model.SubjectId == Guid.Empty)
+    {
+        <div class="card border-0 shadow-sm text-center py-5">
+            <div class="card-body">
+                <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+                <h4>No Subjects Added Yet</h4>
+                <p class="text-muted">Add your semester subjects to start tracking your attendance and safe bunks.</p>
+                <a asp-controller="Subjects" asp-action="Create" class="btn btn-primary"><i class="fas fa-plus me-1"></i>Add Subject</a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Subject Overview Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center py-3">
+                        <small class="text-muted text-uppercase fw-bold">Attendance %</small>
+                        <h2 class="fw-bold mt-1 mb-0" style="color: @GetStatusColor(Model.AttendancePercentage, Model.TargetPercentage, Model.Records.Count);">
+                            @(Model.Records.Count == 0 ? "0.0%" : $"{Model.AttendancePercentage:F1}%")
+                        </h2>
+                        <small class="text-muted">Target: @Model.TargetPercentage%</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center py-3">
+                        <small class="text-muted text-uppercase fw-bold">Lectures Attended</small>
+                        <h2 class="fw-bold text-success mt-1 mb-0">@Model.PresentCount</h2>
+                        <small class="text-muted">Out of @(Model.PresentCount + Model.AbsentCount) conducted</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center py-3">
+                        <small class="text-muted text-uppercase fw-bold">Absences</small>
+                        <h2 class="fw-bold text-danger mt-1 mb-0">@Model.AbsentCount</h2>
+                        <small class="text-muted">Missed lectures</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center py-3">
+                        @if (Model.Records.Count == 0)
+                        {
+                            <small class="text-muted text-uppercase fw-bold">Status</small>
+                            <h4 class="fw-bold text-muted mt-2 mb-0">No Classes Yet</h4>
+                            <small class="text-muted">Start marking below</small>
+                        }
+                        else if (Model.SafeAbsences > 0)
+                        {
+                            <small class="text-muted text-uppercase fw-bold">Safe Absences</small>
+                            <h2 class="fw-bold text-success mt-1 mb-0">@Model.SafeAbsences</h2>
+                            <small class="text-success fw-medium">Can miss without falling below @Model.TargetPercentage%</small>
+                        }
+                        else if (Model.ClassesNeededForTarget > 0)
+                        {
+                            <small class="text-muted text-uppercase fw-bold">Classes Needed</small>
+                            <h2 class="fw-bold text-danger mt-1 mb-0">@Model.ClassesNeededForTarget</h2>
+                            <small class="text-danger fw-medium">Must attend next @Model.ClassesNeededForTarget for @Model.TargetPercentage%</small>
+                        }
+                        else
+                        {
+                            <small class="text-muted text-uppercase fw-bold">Status</small>
+                            <h4 class="fw-bold text-success mt-2 mb-0">On Target!</h4>
+                            <small class="text-muted">Maintaining @Model.TargetPercentage%</small>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Marking & Actions Bar -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body py-3">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fw-bold me-1"><i class="fas fa-bolt text-warning me-1"></i>Quick Mark:</span>
+                        <form asp-action="QuickMark" method="post" class="d-inline">
+                            <input type="hidden" name="subjectId" value="@Model.SubjectId" />
+                            <input type="hidden" name="status" value="present" />
+                            <button type="submit" class="btn btn-success btn-sm px-3">
+                                <i class="fas fa-plus-circle me-1"></i>Mark Present (+1)
+                            </button>
+                        </form>
+                        <form asp-action="QuickMark" method="post" class="d-inline">
+                            <input type="hidden" name="subjectId" value="@Model.SubjectId" />
+                            <input type="hidden" name="status" value="absent" />
+                            <button type="submit" class="btn btn-danger btn-sm px-3">
+                                <i class="fas fa-minus-circle me-1"></i>Mark Absent (+1)
+                            </button>
+                        </form>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#customEntryCollapse">
+                            <i class="fas fa-calendar-plus me-1"></i>Custom Date Entry
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#bulkSetCollapse">
+                            <i class="fas fa-sliders-h me-1"></i>Set Baseline Counts
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Custom Entry Form Collapse -->
+                <div class="collapse mt-3 pt-3 border-top" id="customEntryCollapse">
+                    <form asp-action="AddCustom" method="post" class="row g-2 align-items-end">
+                        <input type="hidden" name="subjectId" value="@Model.SubjectId" />
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold mb-1">Date</label>
+                            <input type="date" name="date" class="form-control form-control-sm" value="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small fw-bold mb-1">Status</label>
+                            <select name="status" class="form-select form-select-sm">
+                                <option value="present">Present</option>
+                                <option value="absent">Absent</option>
+                                <option value="late">Late</option>
+                                <option value="excused">Excused</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small fw-bold mb-1">Lecture #</label>
+                            <input type="number" name="lectureNumber" class="form-control form-control-sm" value="1" min="1" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold mb-1">Notes / Topic</label>
+                            <input type="text" name="notes" class="form-control form-control-sm" placeholder="e.g. Chapter 3" />
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary btn-sm w-100">
+                                <i class="fas fa-save me-1"></i>Save Entry
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Baseline Counts Form Collapse -->
+                <div class="collapse mt-3 pt-3 border-top" id="bulkSetCollapse">
+                    <form asp-action="BulkSet" method="post" class="row g-2 align-items-end">
+                        <input type="hidden" name="subjectId" value="@Model.SubjectId" />
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold mb-1">Lectures Attended (Present)</label>
+                            <input type="number" name="presentCount" class="form-control form-control-sm" value="@Model.PresentCount" min="0" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold mb-1">Total Lectures Conducted</label>
+                            <input type="number" name="totalCount" class="form-control form-control-sm" value="@(Model.PresentCount + Model.AbsentCount)" min="0" required />
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-warning btn-sm w-100" onclick="return confirm('This will set your attendance baseline for @Model.SubjectName. Continue?');">
+                                <i class="fas fa-sync-alt me-1"></i>Update Baseline Counts
+                            </button>
+                        </div>
+                    </form>
+                    <small class="text-muted d-block mt-1">Useful if you already know your past attendance and want to start tracking from today.</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendance Records History Table -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0"><i class="fas fa-history text-primary me-2"></i>Attendance Log (@Model.Records.Count records)</h5>
+                <span class="badge bg-light text-muted">Click 'Toggle' to quickly change Present ⇄ Absent</span>
+            </div>
+            <div class="card-body p-0">
+                @if (!Model.Records.Any())
+                {
+                    <div class="text-center py-5 text-muted">
+                        <i class="fas fa-clipboard-list fa-3x mb-3 text-secondary"></i>
+                        <h5>No attendance records yet for @Model.SubjectName</h5>
+                        <p class="small mb-3">Click <strong>Mark Present (+1)</strong> or <strong>Mark Absent (+1)</strong> above to record your first lecture.</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">Date</th>
+                                    <th>Status</th>
+                                    <th>Notes</th>
+                                    <th class="text-end pe-4">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var record in Model.Records)
+                                {
+                                    <tr>
+                                        <td class="ps-4 fw-medium">@record.Date.ToString("MMM dd, yyyy")</td>
+                                        <td>
+                                            <span class="badge bg-@(record.Status == "present" ? "success" : record.Status == "absent" ? "danger" : record.Status == "cancelled" ? "secondary" : "warning") px-2 py-1">
+                                                <i class="fas fa-@(record.Status == "present" ? "check" : record.Status == "absent" ? "times" : "info-circle") me-1"></i>@record.Status.ToUpper()
+                                            </span>
+                                        </td>
+                                        <td class="text-muted">@(string.IsNullOrEmpty(record.Notes) ? "—" : record.Notes)</td>
+                                        <td class="text-end pe-4">
+                                            <form asp-action="ToggleRecord" asp-route-id="@record.Id" asp-route-subjectId="@Model.SubjectId" method="post" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-outline-primary py-0 px-2" title="Switch status">
+                                                    <i class="fas fa-sync-alt me-1"></i>Toggle
+                                                </button>
+                                            </form>
+                                            <form asp-action="DeleteRecord" asp-route-id="@record.Id" asp-route-subjectId="@Model.SubjectId" method="post" class="d-inline ms-1" onsubmit="return confirm('Remove this record?');">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" title="Delete record">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    }
 </div>
+
+@functions {
+    public string GetStatusColor(double percentage, int target, int total)
+    {
+        if (total == 0) return "#6c757d";
+        if (percentage >= target) return "#22c55e";
+        if (percentage >= target - 5) return "#f59e0b";
+        return "#ef4444";
+    }
+}

@@ -182,6 +182,19 @@ public class SupabaseService : ISupabaseService, IDisposable, IAsyncDisposable
         return result.Models.ToList();
     }
 
+    public async Task<AttendanceRecord?> GetAttendanceByIdAsync(Guid id, Guid userId)
+    {
+        try
+        {
+            var result = await _client.From<AttendanceRecord>()
+                .Filter("id", Operator.Equals, id.ToString())
+                .Filter("user_id", Operator.Equals, userId.ToString())
+                .Get();
+            return result.Models.FirstOrDefault();
+        }
+        catch { return null; }
+    }
+
     public async Task UpdateAttendanceAsync(AttendanceRecord record)
     {
         await _client.From<AttendanceRecord>()
@@ -191,7 +204,9 @@ public class SupabaseService : ISupabaseService, IDisposable, IAsyncDisposable
     public async Task DeleteAttendanceAsync(Guid id, Guid userId)
     {
         await _client.From<AttendanceRecord>()
-            .Delete(new AttendanceRecord { Id = id, UserId = userId });
+            .Filter("id", Operator.Equals, id.ToString())
+            .Filter("user_id", Operator.Equals, userId.ToString())
+            .Delete();
     }
 
     public async Task<AttendanceRecord?> GetAttendanceForSlotAsync(Guid userId, Guid subjectId, DateTime date, int lectureNumber)

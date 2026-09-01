@@ -1,268 +1,376 @@
 @model Attendly.ViewModels.DashboardViewModel
 @{
- ViewData["Title"] = "Dashboard";
- }
+    ViewData["Title"] = "Dashboard";
+}
 
 <div class="dashboard-page" style="background: #f0f2f5; min-height: 100vh;">
- <div class="container-fluid px-4 py-4">
- <!-- Welcome -->
- <div class="d-flex justify-content-between align-items-center mb-4">
- <div>
- <h2 class="fw-bold mb-0">Good @((DateTime.Now.Hour < 12 ? "morning" : DateTime.Now.Hour < 17 ? "afternoon" : "evening")), @Model.UserName! 👋</h2>
- <p class="text-muted mb-0">Here's your attendance overview for today.</p>
- </div>
- <div>
- @if (ViewBag.IsPremium != null && ViewBag.IsPremium)
- {
- <span class="badge bg-warning text-dark fs-6 px-3 py-2"><i class="fas fa-crown me-1"></i>Premium</span>
- }
- </div>
- </div>
+    <div class="container-fluid px-4 py-4">
+        <!-- Toast / Alerts -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
+                <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
 
- <div class="row g-4">
- <!-- Overall Attendance Card -->
- <div class="col-lg-3 col-md-6">
- <div class="card border-0 shadow-sm h-100">
- <div class="card-body text-center py-4">
- <p class="text-muted small text-uppercase fw-bold mb-3">Overall Attendance</p>
- <div class="attendance-circle mx-auto mb-3" style="width: 140px; height: 140px;">
- <div style="width: 140px; height: 140px; border-radius: 50%; background: conic-gradient(@GetAttendanceColor(Model.OverallAttendance, Model.TargetPercentage) @(Model.OverallAttendance * 3.6)deg, #e9ecef @(Model.OverallAttendance * 3.6)deg); display: flex; align-items: center; justify-content: center;">
- <div style="width: 110px; height: 110px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; flex-direction: column;">
- <span class="display-6 fw-bold" style="color: @GetAttendanceColor(Model.OverallAttendance, Model.TargetPercentage);">@Model.OverallAttendance.ToString("F1")%</span>
- <span class="small text-muted">Target: @Model.TargetPercentage%</span>
- </div>
- </div>
- </div>
- <div class="row g-2 mt-2">
- <div class="col-4">
- <div class="p-2 rounded bg-success bg-opacity-10">
- <div class="fw-bold text-success">@Model.PresentCount</div>
- <div class="small text-muted">Present</div>
- </div>
- </div>
- <div class="col-4">
- <div class="p-2 rounded bg-danger bg-opacity-10">
- <div class="fw-bold text-danger">@Model.AbsentCount</div>
- <div class="small text-muted">Absent</div>
- </div>
- </div>
- <div class="col-4">
- <div class="p-2 rounded bg-info bg-opacity-10">
- <div class="fw-bold text-info">@Model.TotalLectures</div>
- <div class="small text-muted">Total</div>
- </div>
- </div>
- </div>
- </div>
- </div>
- </div>
+        <!-- Welcome -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold mb-0">Good @((DateTime.Now.Hour < 12 ? "morning" : DateTime.Now.Hour < 17 ? "afternoon" : "evening")), @Model.UserName! 👋</h2>
+                <p class="text-muted mb-0">Here's your attendance overview for today.</p>
+            </div>
+            <div>
+                @if (ViewBag.IsPremium != null && (bool)ViewBag.IsPremium)
+                {
+                    <span class="badge bg-warning text-dark fs-6 px-3 py-2"><i class="fas fa-crown me-1"></i>Premium</span>
+                }
+            </div>
+        </div>
 
- <!-- Today's Schedule -->
- <div class="col-lg-4 col-md-6">
- <div class="card border-0 shadow-sm h-100">
- <div class="card-body py-3">
- <div class="d-flex justify-content-between align-items-center mb-3">
- <h5 class="fw-bold mb-0"><i class="fas fa-calendar-day text-primary me-2"></i>Today's Schedule</h5>
- <span class="badge bg-primary">@DateTime.Now.ToString("MMM dd, yyyy")</span>
- </div>
- @if (Model.TodaysSchedule.Any())
- {
- <div class="list-group list-group-flush">
- @foreach (var cls in Model.TodaysSchedule)
- {
- <div class="list-group-item d-flex justify-content-between align-items-center px-0">
- <div>
- <strong>@cls.SubjectName</strong>
- <br /><small class="text-muted">@cls.StartTime.ToString(@"hh\:mm") - @cls.EndTime.ToString(@"hh\:mm") @cls.Room</small>
- </div>
- @if (cls.HasAttendance)
- {
- <span class="badge bg-@(cls.AttendanceStatus == "present" ? "success" : cls.AttendanceStatus == "absent" ? "danger" : "secondary")">@cls.AttendanceStatus?.ToUpper()</span>
- }
- else
- {
- <a asp-controller="Attendance" asp-action="Mark" class="btn btn-sm btn-outline-primary">Mark</a>
- }
- </div>
- }
- </div>
- }
- else
- {
- <p class="text-muted text-center py-4"><i class="fas fa-coffee fa-2x mb-2"></i><br />No classes scheduled for today!</p>
- }
- </div>
- </div>
- </div>
+        <div class="row g-4">
+            <!-- Overall Attendance Card -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center py-4">
+                        <p class="text-muted small text-uppercase fw-bold mb-3">Overall Attendance</p>
+                        <div class="attendance-circle mx-auto mb-3" style="width: 140px; height: 140px;">
+                            @if (Model.TotalLectures == 0)
+                            {
+                                <div style="width: 140px; height: 140px; border-radius: 50%; background: #e9ecef; display: flex; align-items: center; justify-content: center;">
+                                    <div style="width: 110px; height: 110px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+                                        <span class="display-6 fw-bold text-muted">0.0%</span>
+                                        <span class="small text-muted">No classes yet</span>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div style="width: 140px; height: 140px; border-radius: 50%; background: conic-gradient(@GetAttendanceColor(Model.OverallAttendance, Model.TargetPercentage) @(Model.OverallAttendance * 3.6)deg, #e9ecef @(Model.OverallAttendance * 3.6)deg); display: flex; align-items: center; justify-content: center;">
+                                    <div style="width: 110px; height: 110px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+                                        <span class="display-6 fw-bold" style="color: @GetAttendanceColor(Model.OverallAttendance, Model.TargetPercentage);">@Model.OverallAttendance.ToString("F1")%</span>
+                                        <span class="small text-muted">Target: @Model.TargetPercentage%</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <div class="row g-2 mt-2">
+                            <div class="col-4">
+                                <div class="p-2 rounded bg-success bg-opacity-10">
+                                    <div class="fw-bold text-success">@Model.PresentCount</div>
+                                    <div class="small text-muted">Present</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="p-2 rounded bg-danger bg-opacity-10">
+                                    <div class="fw-bold text-danger">@Model.AbsentCount</div>
+                                    <div class="small text-muted">Absent</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="p-2 rounded bg-info bg-opacity-10">
+                                    <div class="fw-bold text-info">@Model.TotalLectures</div>
+                                    <div class="small text-muted">Total</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
- <!-- Quick Actions -->
- <div class="col-lg-2 col-md-6">
- <div class="card border-0 shadow-sm h-100">
- <div class="card-body py-3">
- <h5 class="fw-bold mb-3"><i class="fas fa-bolt text-warning me-2"></i>Quick Actions</h5>
- <div class="d-grid gap-2">
- <a asp-controller="Attendance" asp-action="Mark" class="btn btn-outline-primary btn-sm"><i class="fas fa-check me-1"></i>Mark Attendance</a>
- <a asp-controller="Subjects" asp-action="Create" class="btn btn-outline-success btn-sm"><i class="fas fa-plus me-1"></i>Add Subject</a>
- <a asp-controller="Analytics" asp-action="Index" class="btn btn-outline-info btn-sm"><i class="fas fa-chart-bar me-1"></i>View Analytics</a>
- <a asp-controller="Planner" asp-action="Index" class="btn btn-outline-warning btn-sm"><i class="fas fa-plane me-1"></i>Plan Holiday</a>
- <a asp-controller="Connect" asp-action="Index" class="btn btn-outline-secondary btn-sm"><i class="fas fa-users me-1"></i>Find Students</a>
- </div>
- </div>
- </div>
- </div>
+            <!-- Today's Schedule -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body py-3">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold mb-0"><i class="fas fa-calendar-day text-primary me-2"></i>Today's Schedule</h5>
+                            <span class="badge bg-primary">@DateTime.Now.ToString("MMM dd, yyyy")</span>
+                        </div>
+                        @if (Model.TodaysSchedule.Any())
+                        {
+                            <div class="list-group list-group-flush">
+                                @foreach (var cls in Model.TodaysSchedule)
+                                {
+                                    <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                        <div>
+                                            <strong>@cls.SubjectName</strong>
+                                            <br /><small class="text-muted">@cls.StartTime.ToString(@"hh\:mm") - @cls.EndTime.ToString(@"hh\:mm") @cls.Room</small>
+                                        </div>
+                                        @if (cls.HasAttendance)
+                                        {
+                                            <span class="badge bg-@(cls.AttendanceStatus == "present" ? "success" : cls.AttendanceStatus == "absent" ? "danger" : "secondary")">@cls.AttendanceStatus?.ToUpper()</span>
+                                        }
+                                        else
+                                        {
+                                            <div class="d-flex gap-1">
+                                                <form asp-controller="Attendance" asp-action="QuickMark" method="post">
+                                                    <input type="hidden" name="subjectId" value="@cls.SubjectId" />
+                                                    <input type="hidden" name="status" value="present" />
+                                                    <input type="hidden" name="returnUrl" value="/dashboard" />
+                                                    <button type="submit" class="btn btn-sm btn-success px-2 py-1"><i class="fas fa-check"></i></button>
+                                                </form>
+                                                <form asp-controller="Attendance" asp-action="QuickMark" method="post">
+                                                    <input type="hidden" name="subjectId" value="@cls.SubjectId" />
+                                                    <input type="hidden" name="status" value="absent" />
+                                                    <input type="hidden" name="returnUrl" value="/dashboard" />
+                                                    <button type="submit" class="btn btn-sm btn-danger px-2 py-1"><i class="fas fa-times"></i></button>
+                                                </form>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted text-center py-4"><i class="fas fa-coffee fa-2x mb-2"></i><br />No classes scheduled for today!</p>
+                        }
+                    </div>
+                </div>
+            </div>
 
- <!-- Warnings -->
- <div class="col-lg-3 col-md-6">
- <div class="card border-0 shadow-sm h-100">
- <div class="card-body py-3">
- <h5 class="fw-bold mb-3"><i class="fas fa-exclamation-triangle text-warning me-2"></i>Alerts</h5>
- @if (Model.SubjectSummaries.Any(s => s.Status == "CRITICAL"))
- {
- <div class="alert alert-danger border-0">
- <i class="fas fa-times-circle me-1"></i>
- <strong>@Model.SubjectSummaries.Count(s => s.Status == "CRITICAL") subject(s) below target!</strong>
- </div>
- }
- @if (Model.SubjectSummaries.Any(s => s.Status == "WARNING"))
- {
- <div class="alert alert-warning border-0">
- <i class="fas fa-exclamation-circle me-1"></i>
- <strong>@Model.SubjectSummaries.Count(s => s.Status == "WARNING") subject(s) at risk.</strong>
- </div>
- }
- @if (!Model.SubjectSummaries.Any(s => s.Status == "CRITICAL" || s.Status == "WARNING"))
- {
- <div class="alert alert-success border-0">
- <i class="fas fa-check-circle me-1"></i>All subjects look good! 🎉
- </div>
- }
- @if (Model.PendingRequests > 0)
- {
- <div class="alert alert-info border-0">
- <i class="fas fa-user-plus me-1"></i>@Model.PendingRequests pending connection request(s).
- </div>
- }
- </div>
- </div>
- </div>
- </div>
+            <!-- Quick Actions -->
+            <div class="col-lg-2 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body py-3">
+                        <h5 class="fw-bold mb-3"><i class="fas fa-bolt text-warning me-2"></i>Quick Actions</h5>
+                        <div class="d-grid gap-2">
+                            <a asp-controller="Attendance" asp-action="Index" class="btn btn-outline-primary btn-sm"><i class="fas fa-clipboard-check me-1"></i>Track Attendance</a>
+                            <a asp-controller="Subjects" asp-action="Create" class="btn btn-outline-success btn-sm"><i class="fas fa-plus me-1"></i>Add Subject</a>
+                            <a asp-controller="Analytics" asp-action="Index" class="btn btn-outline-info btn-sm"><i class="fas fa-chart-bar me-1"></i>View Analytics</a>
+                            <a asp-controller="Planner" asp-action="Index" class="btn btn-outline-warning btn-sm"><i class="fas fa-plane me-1"></i>Plan Holiday</a>
+                            <a asp-controller="Connect" asp-action="Index" class="btn btn-outline-secondary btn-sm"><i class="fas fa-users me-1"></i>Find Students</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
- <!-- Subject Cards -->
- <div class="row mt-2">
- <div class="col-12">
- <div class="card border-0 shadow-sm">
- <div class="card-body">
- <div class="d-flex justify-content-between align-items-center mb-3">
- <h5 class="fw-bold"><i class="fas fa-book-open text-primary me-2"></i>Subjects Overview</h5>
- <a asp-controller="Subjects" asp-action="Index" class="btn btn-sm btn-outline-primary">View All</a>
- </div>
- <div class="row g-3">
- @foreach (var subj in Model.SubjectSummaries)
- {
- <div class="col-md-6 col-xl-3">
- <div class="card border-0 h-100" style="border-left: 4px solid @subj.Color !important;">
- <div class="card-body">
- <div class="d-flex justify-content-between align-items-start">
- <div>
- <h6 class="fw-bold mb-0">@subj.Name</h6>
- <small class="text-muted">@subj.Code</small>
- </div>
- <span class="badge bg-@(subj.Status == "SAFE" ? "success" : subj.Status == "WARNING" ? "warning" : "danger")">@subj.Status</span>
- </div>
- <div class="mt-3">
- <div class="d-flex justify-content-between small mb-1">
- <span>@subj.Present / @subj.Total attended</span>
- <span class="fw-bold">@subj.AttendancePercentage.ToString("F1")%</span>
- </div>
- <div class="progress" style="height: 8px;">
- <div class="progress-bar" style="width: @subj.AttendancePercentage%; background-color: @subj.Color;"></div>
- </div>
- </div>
- <div class="mt-2 d-flex gap-3 small text-muted">
- <span><i class="fas fa-check text-success me-1"></i>@subj.Present</span>
- <span><i class="fas fa-times text-danger me-1"></i>@subj.Absent</span>
- <span>Total: @subj.Total</span>
- </div>
- </div>
- </div>
- </div>
- }
- </div>
- </div>
- </div>
- </div>
+            <!-- Warnings & Alerts -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body py-3">
+                        <h5 class="fw-bold mb-3"><i class="fas fa-exclamation-triangle text-warning me-2"></i>Alerts</h5>
+                        @if (Model.SubjectSummaries.Any(s => s.Status == "CRITICAL"))
+                        {
+                            <div class="alert alert-danger border-0 py-2 mb-2">
+                                <i class="fas fa-times-circle me-1"></i>
+                                <strong>@Model.SubjectSummaries.Count(s => s.Status == "CRITICAL") subject(s) below target!</strong>
+                            </div>
+                        }
+                        @if (Model.SubjectSummaries.Any(s => s.Status == "WARNING"))
+                        {
+                            <div class="alert alert-warning border-0 py-2 mb-2">
+                                <i class="fas fa-exclamation-circle me-1"></i>
+                                <strong>@Model.SubjectSummaries.Count(s => s.Status == "WARNING") subject(s) at risk.</strong>
+                            </div>
+                        }
+                        @if (Model.SubjectSummaries.Any(s => s.Status == "NO_DATA"))
+                        {
+                            <div class="alert alert-secondary border-0 py-2 mb-2">
+                                <i class="fas fa-info-circle me-1"></i>
+                                <strong>@Model.SubjectSummaries.Count(s => s.Status == "NO_DATA") new subject(s) awaiting records.</strong>
+                            </div>
+                        }
+                        @if (!Model.SubjectSummaries.Any(s => s.Status == "CRITICAL" || s.Status == "WARNING" || s.Status == "NO_DATA") && Model.SubjectSummaries.Any())
+                        {
+                            <div class="alert alert-success border-0 py-2 mb-2">
+                                <i class="fas fa-check-circle me-1"></i>All subjects look good! 🎉
+                            </div>
+                        }
+                        @if (Model.PendingRequests > 0)
+                        {
+                            <div class="alert alert-info border-0 py-2 mb-0">
+                                <i class="fas fa-user-plus me-1"></i>@Model.PendingRequests pending request(s).
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
 
- <!-- Upcoming Holidays -->
- <div class="row mt-3">
- <div class="col-lg-5">
- <div class="card border-0 shadow-sm">
- <div class="card-body">
- <h5 class="fw-bold mb-3"><i class="fas fa-umbrella-beach text-info me-2"></i>Upcoming Holidays</h5>
- @if (Model.UpcomingHolidays.Any())
- {
- <div class="list-group list-group-flush">
- @foreach (var h in Model.UpcomingHolidays)
- {
- <div class="list-group-item d-flex justify-content-between align-items-center px-0">
- <div>
- <strong>@h.Name</strong>
- <br /><small class="text-muted">@h.Date.ToString("MMM dd, yyyy")</small>
- </div>
- <span class="badge bg-@(h.Type == "public" ? "primary" : "success")">@h.DaysUntil days</span>
- </div>
- }
- </div>
- }
- else
- {
- <p class="text-muted">No upcoming holidays in the next 3 months.</p>
- }
- </div>
- </div>
- </div>
+        <!-- Subject Cards -->
+        <div class="row mt-3">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h5 class="fw-bold mb-0"><i class="fas fa-book-open text-primary me-2"></i>Subjects & Quick Attendance</h5>
+                                <small class="text-muted">Tap + Present or - Absent to instantly update attendance</small>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <a asp-controller="Attendance" asp-action="Index" class="btn btn-sm btn-primary"><i class="fas fa-list me-1"></i>Manage Attendance</a>
+                                <a asp-controller="Subjects" asp-action="Index" class="btn btn-sm btn-outline-secondary">View All Subjects</a>
+                            </div>
+                        </div>
+                        <div class="row g-3">
+                            @if (!Model.SubjectSummaries.Any())
+                            {
+                                <div class="col-12 text-center py-4">
+                                    <p class="text-muted mb-2"><i class="fas fa-folder-open fa-2x"></i><br />No subjects added yet.</p>
+                                    <a asp-controller="Subjects" asp-action="Create" class="btn btn-sm btn-success"><i class="fas fa-plus me-1"></i>Add Your First Subject</a>
+                                </div>
+                            }
+                            @foreach (var subj in Model.SubjectSummaries)
+                            {
+                                <div class="col-md-6 col-xl-3">
+                                    <div class="card border-0 h-100 shadow-sm" style="border-left: 4px solid @subj.Color !important;">
+                                        <div class="card-body d-flex flex-column justify-content-between">
+                                            <div>
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <h6 class="fw-bold mb-0">@subj.Name</h6>
+                                                        <small class="text-muted">@subj.Code</small>
+                                                    </div>
+                                                    @if (subj.Total == 0)
+                                                    {
+                                                        <span class="badge bg-secondary">NO DATA</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-@(subj.Status == "SAFE" ? "success" : subj.Status == "WARNING" ? "warning" : "danger")">@subj.Status</span>
+                                                    }
+                                                </div>
 
- <!-- Weekend Opportunities -->
- <div class="col-lg-7">
- <div class="card border-0 shadow-sm">
- <div class="card-body">
- <h5 class="fw-bold mb-3"><i class="fas fa-plane-departure text-success me-2"></i>Weekend Opportunities</h5>
- @if (Model.WeekendOpportunities.Any())
- {
- <div class="list-group list-group-flush">
- @foreach (var opp in Model.WeekendOpportunities)
- {
- <div class="list-group-item px-0">
- <div class="d-flex justify-content-between align-items-center">
- <div>
- <strong>@opp.HolidayName</strong>
- <br /><small class="text-muted">@opp.WeekendStart.ToString("MMM dd") - @opp.WeekendEnd.ToString("MMM dd")</small>
- <br /><small class="text-muted">@opp.LecturesMissed lectures would be missed</small>
- </div>
- <span class="badge bg-@(opp.IsSafe ? "success" : "danger")">@opp.ProjectedAttendance.ToString("F1")% after</span>
- </div>
- </div>
- }
- </div>
- }
- else
- {
- <p class="text-muted">No extended weekend opportunities found.</p>
- <a asp-controller="Planner" asp-action="Index" class="btn btn-sm btn-outline-success">Check Planner</a>
- }
- </div>
- </div>
- </div>
- </div>
- </div>
- </div>
+                                                <div class="mt-3">
+                                                    <div class="d-flex justify-content-between small mb-1">
+                                                        <span>@subj.Present / @subj.Total attended</span>
+                                                        <span class="fw-bold">@subj.AttendancePercentage.ToString("F1")%</span>
+                                                    </div>
+                                                    <div class="progress" style="height: 8px;">
+                                                        <div class="progress-bar" style="width: @(subj.Total == 0 ? 0 : subj.AttendancePercentage)%; background-color: @subj.Color;"></div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="mt-2 d-flex justify-content-between small text-muted">
+                                                    <span><i class="fas fa-check text-success me-1"></i>@subj.Present P</span>
+                                                    <span><i class="fas fa-times text-danger me-1"></i>@subj.Absent A</span>
+                                                    <span>Goal: @subj.TargetPercentage%</span>
+                                                </div>
+
+                                                <div class="mt-2">
+                                                    @if (subj.Total == 0)
+                                                    {
+                                                        <div class="small text-muted"><i class="fas fa-info-circle me-1"></i>0 lectures taken yet</div>
+                                                    }
+                                                    else if (subj.SafeAbsences > 0)
+                                                    {
+                                                        <div class="small text-success fw-medium"><i class="fas fa-shield-alt me-1"></i>Safe to miss <strong>@subj.SafeAbsences</strong> lecture(s)</div>
+                                                    }
+                                                    else if (subj.ClassesNeeded > 0)
+                                                    {
+                                                        <div class="small text-danger fw-medium"><i class="fas fa-exclamation-circle me-1"></i>Attend next <strong>@subj.ClassesNeeded</strong> class(es)</div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="small text-info fw-medium"><i class="fas fa-bullseye me-1"></i>On track for @subj.TargetPercentage%!</div>
+                                                    }
+                                                </div>
+                                            </div>
+
+                                            <!-- 1-Click Quick Action Buttons -->
+                                            <div class="mt-3 pt-2 border-top">
+                                                <div class="d-flex gap-2">
+                                                    <form asp-controller="Attendance" asp-action="QuickMark" method="post" class="flex-grow-1">
+                                                        <input type="hidden" name="subjectId" value="@subj.SubjectId" />
+                                                        <input type="hidden" name="status" value="present" />
+                                                        <input type="hidden" name="returnUrl" value="/dashboard" />
+                                                        <button type="submit" class="btn btn-sm btn-success w-100 py-1" title="Mark 1 Present Lecture">
+                                                            <i class="fas fa-plus me-1"></i>Present
+                                                        </button>
+                                                    </form>
+                                                    <form asp-controller="Attendance" asp-action="QuickMark" method="post" class="flex-grow-1">
+                                                        <input type="hidden" name="subjectId" value="@subj.SubjectId" />
+                                                        <input type="hidden" name="status" value="absent" />
+                                                        <input type="hidden" name="returnUrl" value="/dashboard" />
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger w-100 py-1" title="Mark 1 Absent Lecture">
+                                                            <i class="fas fa-minus me-1"></i>Absent
+                                                        </button>
+                                                    </form>
+                                                    <a asp-controller="Attendance" asp-action="Index" asp-route-subjectId="@subj.SubjectId" class="btn btn-sm btn-light py-1" title="View Records">
+                                                        <i class="fas fa-chevron-right"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Holidays & Weekend Opportunities -->
+        <div class="row mt-3">
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3"><i class="fas fa-umbrella-beach text-info me-2"></i>Upcoming Holidays</h5>
+                        @if (Model.UpcomingHolidays.Any())
+                        {
+                            <div class="list-group list-group-flush">
+                                @foreach (var h in Model.UpcomingHolidays)
+                                {
+                                    <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                        <div>
+                                            <strong>@h.Name</strong>
+                                            <br /><small class="text-muted">@h.Date.ToString("MMM dd, yyyy")</small>
+                                        </div>
+                                        <span class="badge bg-@(h.Type == "public" ? "primary" : "success")">@h.DaysUntil days</span>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted">No upcoming holidays in the next 3 months.</p>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3"><i class="fas fa-plane-departure text-success me-2"></i>Weekend Opportunities</h5>
+                        @if (Model.WeekendOpportunities.Any())
+                        {
+                            <div class="list-group list-group-flush">
+                                @foreach (var opp in Model.WeekendOpportunities)
+                                {
+                                    <div class="list-group-item px-0">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>@opp.HolidayName</strong>
+                                                <br /><small class="text-muted">@opp.WeekendStart.ToString("MMM dd") - @opp.WeekendEnd.ToString("MMM dd")</small>
+                                                <br /><small class="text-muted">@opp.LecturesMissed lectures would be missed</small>
+                                            </div>
+                                            <span class="badge bg-@(opp.IsSafe ? "success" : "danger")">@opp.ProjectedAttendance.ToString("F1")% after</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted">No extended weekend opportunities found.</p>
+                            <a asp-controller="Planner" asp-action="Index" class="btn btn-sm btn-outline-success">Check Planner</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @functions {
- public string GetAttendanceColor(double percentage, int target)
- {
- if (percentage >= target + 5) return "#22c55e";
- if (percentage >= target) return "#22c55e";
- if (percentage >= target - 5) return "#f59e0b";
- return "#ef4444";
- }
+    public string GetAttendanceColor(double percentage, int target)
+    {
+        if (percentage == 0.0) return "#6c757d";
+        if (percentage >= target) return "#22c55e";
+        if (percentage >= target - 5) return "#f59e0b";
+        return "#ef4444";
+    }
 }

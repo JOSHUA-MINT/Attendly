@@ -26,6 +26,7 @@ public interface ISupabaseService
  Task<AttendanceRecord> CreateAttendanceAsync(AttendanceRecord record);
  Task<List<AttendanceRecord>> GetAttendanceRecordsAsync(Guid userId, Guid subjectId);
  Task<List<AttendanceRecord>> GetAttendanceForDateAsync(Guid userId, DateTime date);
+ Task<AttendanceRecord?> GetAttendanceByIdAsync(Guid id, Guid userId);
  Task UpdateAttendanceAsync(AttendanceRecord record);
  Task DeleteAttendanceAsync(Guid id, Guid userId);
  Task<AttendanceRecord?> GetAttendanceForSlotAsync(Guid userId, Guid subjectId, DateTime date, int lectureNumber);
